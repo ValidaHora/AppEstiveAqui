@@ -1,4 +1,4 @@
-body, .pane, .view {
+body {
 	color: #DDD !important;
 	background: #000;
 }
@@ -12,18 +12,6 @@ textarea {
 	width: 100%;
 	resize: none;
 	border-radius: 5px;
-}
-
-.popup {
-	color: #000;
-}
-.popup-head {
-	background-color: #184B68;
-	padding: 8px 10px;
-}
-
-.popup-head h3 {
-	color: #FFF;
 }
 
 .text-center { text-align: center }
@@ -41,7 +29,7 @@ textarea {
 	color: #FFF;
 }
 
-.bar-header .h1, .bar-header h1,
+.bar-header .h1,
 .bar-header .button,
 .bar-header .button:hover {
 	color: #FFF;
@@ -67,12 +55,16 @@ textarea {
 
 /* SELECIONAR TOKEN
 ================================== */
-.lista {
+.list.local {
 	width: 100%;
-	background: none;
 	border-bottom: 1px solid #2A84B7;
+}
+
+.list.local .item,
+.list.local .item .input-label,
+.list.local .item-select select { 
+	background: #000;
 	color: #DDD;
-	padding: 15px 0;
 }
 
 select {

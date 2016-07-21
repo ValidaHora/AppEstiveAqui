@@ -1,0 +1,44 @@
+<ion-view view-title="Index Page">
+	<ion-nav-buttons side="right">
+		<button class="button button-clear button-positive">
+			<img src="img/sateliteOn.png" />
+		</button>
+		<button class="button button-clear button-positive">
+			<img src="img/syncHora.png" />
+			<span class="badge badge-assertive">2</span>
+		</button>
+	</ion-nav-buttons>
+	
+	<ion-content class="content has-header">
+		<div id="checkin-wrapper" ng-if="isShowMain">
+			<!-- Exibir esta row quando houver mais de um token por usuário -->
+			<div class="row">
+				<div class="col lista">
+					<select>
+						<option>Lançando hora em <b>Casa</b></option>
+						<option>Lançando hora em <b>Sítio</b></option>
+						<option>Lançando hora em <b>Praia</b></option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col col-80 col-offset-10 inserir-codigo"><img src="img/relogio.png" /><input type="number" name="token" placeholder="Inserir código">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col col-80 col-offset-10">
+					<button class="button button-block button-positive lancar-hora" ng-click="validateToken()">Lançar hora</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col text-center margin-top">
+					<a ng-click="displayHistory()">Veja todas as horas lançadas hoje</a>
+				</div>
+			</div>
+		</div>
+		
+		<ng-include src="'templates/success.html'"></ng-include>
+		<ng-include src="'templates/error.html'"></ng-include>
+	</ion-content>
+</ion-view>

@@ -1,0 +1,19 @@
+<div id="error-wrapper" ng-if="isError">
+	<div class="row">
+		<div class="col col-80 col-offset-10 text-center"><img src="img/erro.png" />
+		</div>
+	</div>
+	<div class="row">
+		<div class="col col-80 col-offset-10 text-center">
+			<p>Código inválido. Verifique se o passclock é o correto.</p>
+			<p>Clique no botão abaixo para lançar sua hora.</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col col-80 col-offset-10">
+			<button class="button button-block button-positive lancar-hora" ng-click="displayMain()">Tente Novamente</button>
+		</div>
+	</div>
+</div>
+
+

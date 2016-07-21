@@ -1,5 +1,5 @@
 angular.module('starter.controllers')
-.controller('CheckInCtrl', function($scope, $ionicModal, $ionicSideMenuDelegate){
+.controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate){
 	$scope.toggleLeft = function(){
 		$ionicSideMenuDelegate.toggleLeft();
 	};
@@ -26,6 +26,12 @@ angular.module('starter.controllers')
 	$scope.isShowMain = true;
 	$scope.isSuccess = false;
 	$scope.isError = false;
+	$scope.hasNetwork = $cordovaNetwork.getNetwork()!=navigator.connection.NONE;
+	
+	$scope.toggleNetState = function(event, networkState){
+		console.log('network state changed to:', networkState);
+		$scope.hasNetwork = (networkState != navigator.connection.NONE);
+	}
 	
 	$scope.displaySuccess = function(){
 		$scope.isShowMain = false;
@@ -48,4 +54,7 @@ angular.module('starter.controllers')
 	$scope.validateToken = function(){
 		$scope.displaySuccess();
 	}
+	
+	$rootScope.$on('$cordovaNetwork:online', $scope.toggleNetState);
+	$rootScope.$on('$cordovaNetwork:offline', $scope.toggleNetState);
 })

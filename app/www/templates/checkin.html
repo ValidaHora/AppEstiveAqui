@@ -1,7 +1,7 @@
-<ion-view view-title="Index Page">
+<ion-view view-title="Valida Hora">
 	<ion-nav-buttons side="right">
 		<button class="button button-clear button-positive">
-			<img src="img/sateliteOn.png" />
+			<img ng-src="img/satelite{{hasNetwork?'On':'Off'}}.png" />
 		</button>
 		<button class="button button-clear button-positive">
 			<img src="img/syncHora.png" />
@@ -28,7 +28,7 @@
 			</div>
 			<div class="row">
 				<div class="col col-80 col-offset-10">
-					<button class="button button-block button-positive lancar-hora" ng-click="validateToken()">Lançar hora</button>
+					<button class="button button-block button-positive lancar-hora" ng-click="validateToken()" ng-disabled="!hasNetwork">Lançar hora</button>
 				</div>
 			</div>
 			<div class="row">

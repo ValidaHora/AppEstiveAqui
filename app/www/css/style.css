@@ -29,7 +29,7 @@ textarea {
 	color: #FFF;
 }
 
-.bar-header .h1,
+.bar-header .h1, .bar-header h1,
 .bar-header .button,
 .bar-header .button:hover {
 	color: #FFF;

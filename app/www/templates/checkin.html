@@ -12,12 +12,15 @@
 	<ion-content class="content has-header">
 		<div id="checkin-wrapper" ng-if="isShowMain">
 			<!-- Exibir esta row quando houver mais de um token por usuário -->
-			<div class="row">
-				<div class="col lista">
+			<div class="list local">
+				<label class="item item-input item-select">
+					<div class="input-label">
+						Lançando hora em
+					</div>
 					<select ng-model="token.place">
-						<option ng-repeat="place in places" value="{{place}}">Lançando hora em <b>{{place}}</b></option>
+						<option ng-repeat="place in places" value="{{place}}">{{place}}</option>
 					</select>
-				</div>
+				</label>
 			</div>
 
 			<div class="row">

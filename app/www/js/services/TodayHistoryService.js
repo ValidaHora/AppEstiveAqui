@@ -12,6 +12,19 @@ angular.module('starter.services').factory('TodayHistory', function(LocalStorage
 		return history.list;
 	};
 	
+	var getSyncCount = function(){
+		var item;
+		var list = getList();
+		var count = 0;
+		for(var i in list){
+			item = list[i];
+			if(!item.sync)
+				count ++;
+		}
+		
+		return count;
+	};
+	
 	var create = function(place, code, sync){
 		var date = new Date();
 		var slice = -2;
@@ -64,5 +77,6 @@ angular.module('starter.services').factory('TodayHistory', function(LocalStorage
 	return {
 		add: add,
 		getList: getList,
+		getSyncCount: getSyncCount,
 	}
 })

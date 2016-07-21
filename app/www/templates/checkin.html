@@ -3,9 +3,9 @@
 		<button class="button button-clear button-positive">
 			<img ng-src="img/satelite{{hasNetwork?'On':'Off'}}.png" />
 		</button>
-		<button class="button button-clear button-positive">
+		<button class="button button-clear button-positive" ng-click="sync()" ng-disabled="syncCount==0||!hasNetwork">
 			<img src="img/syncHora.png" />
-			<span class="badge badge-assertive">2</span>
+			<span class="badge badge-assertive" ng-if="syncCount>0">{{syncCount}}</span>
 		</button>
 	</ion-nav-buttons>
 	
@@ -26,12 +26,12 @@
 			<div class="row">
 				<div class="col col-80 col-offset-10 inserir-codigo">
 					<img src="img/relogio.png" />
-					<input type="number" name="token" max="999999" placeholder="Inserir código" ng-model="token.number" />
+					<input type="number" name="token" placeholder="Inserir código" ng-model="token.number" />
 				</div>
 			</div>
 			<div class="row">
 				<div class="col col-80 col-offset-10">
-					<button class="button button-block button-positive lancar-hora" ng-click="registerToken()" ng-disabled="!hasNetwork">Lançar hora</button>
+					<button class="button button-block button-positive lancar-hora" ng-click="registerToken()">Lançar hora</button>
 				</div>
 			</div>
 			<div class="row">

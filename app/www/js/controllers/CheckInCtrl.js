@@ -63,9 +63,13 @@ angular.module('starter.controllers')
 		
 		}else if( !OTP.isEquals($scope.token.number) ){
 			$scope.simpleAlert('Erro', 'Código inválido');
+			
 		}else{
 			TodayHistory.add($scope.token.place, $scope.token.number, false);
 			$scope.displaySuccess();
+			$scope.token.number = null;
+			$scope.token.place = null;
+			$scope.syncCount = TodayHistory.getSyncCount();
 		}
 	}
 	
@@ -78,7 +82,8 @@ angular.module('starter.controllers')
 	$scope.isShowMain = true;
 	$scope.isSuccess = false;
 	$scope.isError = false;
-	$scope.hasNetwork = true;
+	$scope.hasNetwork = false;
+	$scope.syncCount = TodayHistory.getSyncCount();
 	
 	$scope.history = TodayHistory.getList();
 })

@@ -23,9 +23,9 @@ angular.module('starter.services', [])
 			StatusBar.styleDefault();
 		}
 		
-		var platform = 'web';//$cordovaDevice.getPlatform().toLowerCase();
-		$rootScope.isDroid = platform=='android';
-		$rootScope.isApple = platform=='ios';
+		//var platform = $cordovaDevice.getPlatform().toLowerCase();
+		$rootScope.isDroid = ionic.Platform.isAndroid();
+		$rootScope.isApple = ionic.Platform.isIOS();
 		$rootScope.isWeb = !$rootScope.isDroid && !$rootScope.isApple;
 		
 		$rootScope.simpleAlert = function(title, message){

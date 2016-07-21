@@ -1,4 +1,4 @@
-body {
+body, .pane, .view {
 	color: #DDD !important;
 	background: #000;
 }
@@ -12,6 +12,17 @@ textarea {
 	width: 100%;
 	resize: none;
 	border-radius: 5px;
+}
+
+.popup {
+	color: #000;
+}
+.popup-head {
+	background-color: #184B68;
+	padding: 8px 10px;
+}
+.popup-head h3 {
+	color: #FFF;
 }
 
 .text-center { text-align: center }
@@ -29,7 +40,7 @@ textarea {
 	color: #FFF;
 }
 
-.bar-header .h1,
+.bar-header .h1, .bar-header h1,
 .bar-header .button,
 .bar-header .button:hover {
 	color: #FFF;

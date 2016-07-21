@@ -1,5 +1,5 @@
 angular.module('starter.controllers')
-.controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate){
+.controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate, OTP, TodayHistory){
 	$scope.toggleLeft = function(){
 		$ionicSideMenuDelegate.toggleLeft();
 	};
@@ -22,15 +22,18 @@ angular.module('starter.controllers')
 		$scope.modal.remove();
 	});
 	
-	
-	$scope.isShowMain = true;
-	$scope.isSuccess = false;
-	$scope.isError = false;
-	$scope.hasNetwork = $cordovaNetwork.getNetwork()!=navigator.connection.NONE;
+	if(!$scope.isWeb){
+		//BUG objeto Connection so fica disponivel depois do settimeout
+		setTimeout(function(){
+			var bug = Connection.UNKNOW;
+			$scope.hasNetwork = $cordovaNetwork.isOnline();//$cordovaNetwork.getNetwork()!=Connection.NONE;
+		}, 0);
+	}
 	
 	$scope.toggleNetState = function(event, networkState){
 		console.log('network state changed to:', networkState);
-		$scope.hasNetwork = (networkState != navigator.connection.NONE);
+		var has = $cordovaNetwork.isOnline();//networkState != 'none';//navigator.connection.type.NONE;
+		$scope.hasNetwork = has;
 	}
 	
 	$scope.displaySuccess = function(){
@@ -50,11 +53,32 @@ angular.module('starter.controllers')
 		$scope.isSuccess = false;
 		$scope.isError = false;
 	}
+	
+	$scope.registerToken = function(){
+		if(!$scope.token.place){
+			$scope.simpleAlert('Erro', 'Selecione o local');
 		
-	$scope.validateToken = function(){
-		$scope.displaySuccess();
+		}else if(!$scope.token.number){
+			$scope.simpleAlert('Erro', 'Código não pode ser vazio');
+		
+		}else if( !OTP.isEquals($scope.token.number) ){
+			$scope.simpleAlert('Erro', 'Código inválido');
+		}else{
+			TodayHistory.add($scope.token.place, $scope.token.number, false);
+			$scope.displaySuccess();
+		}
 	}
 	
 	$rootScope.$on('$cordovaNetwork:online', $scope.toggleNetState);
 	$rootScope.$on('$cordovaNetwork:offline', $scope.toggleNetState);
+	
+	$scope.places = ['Casa', 'Sítio', 'Praia'];
+	
+	$scope.token = {number: null, place:null};
+	$scope.isShowMain = true;
+	$scope.isSuccess = false;
+	$scope.isError = false;
+	$scope.hasNetwork = true;
+	
+	$scope.history = TodayHistory.getList();
 })

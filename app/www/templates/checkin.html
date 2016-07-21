@@ -14,21 +14,21 @@
 			<!-- Exibir esta row quando houver mais de um token por usuário -->
 			<div class="row">
 				<div class="col lista">
-					<select>
-						<option>Lançando hora em <b>Casa</b></option>
-						<option>Lançando hora em <b>Sítio</b></option>
-						<option>Lançando hora em <b>Praia</b></option>
+					<select ng-model="token.place">
+						<option ng-repeat="place in places" value="{{place}}">Lançando hora em <b>{{place}}</b></option>
 					</select>
 				</div>
 			</div>
 
 			<div class="row">
-				<div class="col col-80 col-offset-10 inserir-codigo"><img src="img/relogio.png" /><input type="number" name="token" placeholder="Inserir código">
+				<div class="col col-80 col-offset-10 inserir-codigo">
+					<img src="img/relogio.png" />
+					<input type="number" name="token" max="999999" placeholder="Inserir código" ng-model="token.number" />
 				</div>
 			</div>
 			<div class="row">
 				<div class="col col-80 col-offset-10">
-					<button class="button button-block button-positive lancar-hora" ng-click="validateToken()" ng-disabled="!hasNetwork">Lançar hora</button>
+					<button class="button button-block button-positive lancar-hora" ng-click="registerToken()" ng-disabled="!hasNetwork">Lançar hora</button>
 				</div>
 			</div>
 			<div class="row">

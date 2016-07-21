@@ -14,6 +14,18 @@ textarea {
 	border-radius: 5px;
 }
 
+.popup {
+	color: #000;
+}
+.popup-head {
+	background-color: #184B68;
+	padding: 8px 10px;
+}
+
+.popup-head h3 {
+	color: #FFF;
+}
+
 .text-center { text-align: center }
 
 .margin { margin: 1.5em }

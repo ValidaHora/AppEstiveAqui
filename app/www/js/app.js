@@ -6,24 +6,43 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'ngCordova']);
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters', 'ngCordova']);
+angular.module('starter.filters', []);
 angular.module('starter.controllers', []);
-angular.module('starter.services', []);
-
-angular.module('starter').run(function($ionicPlatform) {
+angular.module('starter.services', [])
+.run(function($ionicPlatform, $rootScope, $ionicPopup, $cordovaDevice) {
+	$rootScope.VH_BASE_URL = 'http://app.des.validahora.com.br/ValidaHora/';
+	$rootScope.EA_BASE_URL = 'http://app.des.estiveaqui.com.br/EstiveAqui/';
+	
 	$ionicPlatform.ready(function() {
-	// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-	// for form inputs)
-	if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
-		cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-		cordova.plugins.Keyboard.disableScroll(true);
+		//console.log('UUID', window.device.uuid);
+		
+		// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+		// for form inputs)
+		if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
+			cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+			cordova.plugins.Keyboard.disableScroll(true);
 
-	}
-	if (window.StatusBar) {
-		// org.apache.cordova.statusbar required
-		StatusBar.styleDefault();
-	}
-});
+		}
+		if (window.StatusBar) {
+			// org.apache.cordova.statusbar required
+			StatusBar.styleDefault();
+		}
+		
+		//var platform = $cordovaDevice.getPlatform().toLowerCase();
+		$rootScope.isDroid = ionic.Platform.isAndroid();
+		$rootScope.isApple = ionic.Platform.isIOS();
+		$rootScope.isWeb = !$rootScope.isDroid && !$rootScope.isApple;
+		
+		$rootScope.simpleAlert = function(title, message){
+			var popup = $ionicPopup.alert({
+			    title: '<i class="icon ion-ios-information-outline"></i> '+title,
+			    template: message,
+		  	});
+		  	
+		  	return popup;
+		};		
+	});
 })
 
 .config(function($stateProvider, $urlRouterProvider) {
@@ -51,6 +70,12 @@ angular.module('starter').run(function($ionicPlatform) {
 		url: '/howwork',
 		templateUrl: 'templates/howwork.html',
 		controller: 'HowWorkCtrl',
+	})
+	
+	.state('activation', {
+		url: '/activation/:code',
+		templateUrl: 'templates/activation.html',
+		controller: 'ActivationTokenCtrl',
 	})
 	
 	.state('about', {

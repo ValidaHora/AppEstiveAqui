@@ -23,7 +23,11 @@
     "cordova-plugin-statusbar",
     "ionic-plugin-keyboard",
     "cordova-plugin-x-socialsharing",
-    "cordova-plugin-inappbrowser"
+    "cordova-plugin-inappbrowser",
+    "cordova-plugin-network-information",
+    "cordova-plugin-geolocation"
   ],
-  "cordovaPlatforms": []
+  "cordovaPlatforms": [
+    "android"
+  ]
 }

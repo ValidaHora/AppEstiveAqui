@@ -15,7 +15,10 @@
 	<!-- ionic/angularjs js -->
 	<script src="lib/ionic/js/ionic.bundle.js"></script>
 	<script src="lib/ngCordova/dist/ng-cordova.js"></script>
-
+	
+	<!-- other libs -->
+	<script src="lib/jsSHA/src/sha.js"></script>
+	
 	<!-- cordova script (this will be a 404 during development) -->
 	<script src="cordova.js"></script>
 	
@@ -25,13 +28,73 @@
 	<!-- controllers -->
 	<script src="js/controllers/IndexCtrl.js"></script>
 	<script src="js/controllers/CheckInCtrl.js"></script>
-	<script src="js/controllers/HowWorkCtrl.js"></script>
 	<script src="js/controllers/AboutCtrl.js"></script>
+	<script src="js/controllers/HowWorkCtrl.js"></script>
+	<script src="js/controllers/ActivationTokenCtrl.js"></script>
 	
 	<!-- services -->
 	<script src="js/services.js"></script>
+	<script src="js/services/OTPService.js"></script>
+	<script src="js/services/LocalStorageService.js"></script>
+	<script src="js/services/TodayHistoryService.js"></script>
+	<script src="js/services/ApiRequestService.js"></script>
+	<script src="js/services/ApiValidaHoraService.js"></script>
+	<script src="js/services/ApiEstiveAquiService.js"></script>
+	<script src="js/services/PassClockManagerService.js"></script>
+	<script src="js/services/EntryManagerService.js"></script>
+	<script src="js/services/UserService.js"></script>
+	<script src="js/services/TimeHelperService.js"></script>
 	
+	<!-- services -->
+	<script src="js/filters/DateFilter.js"></script>
 	
+	<script type="text/javascript">
+		function handleOpenURL(url) {
+			setTimeout(function(){
+		  		var params = parseScheme(url);
+		  		
+		  		if(params){
+		  			if(params.code){
+		  				window.location.href = '/#activation/'+params.code;
+		  			}else{
+		  				console.log('code not exists');
+		  			}
+		  		}else{
+		  			console.log('empty params');
+		  			console.log(params, url);
+		  		}
+			}, 0);
+		}
+		
+		function parseScheme(url){
+			if(!url)
+				url = '';
+			
+			var scheme = 'validahora://';
+			var paramsStr = url.replace(scheme).replace('?', '&');
+			var paramsList = paramsStr.split('&');
+			var paramItem;
+			var params = {};
+			var name, value;
+			
+			for(var i in paramsList){
+				paramItem = paramsList[i].split('=');
+				if(paramItem[1]){
+					name = paramItem[0];
+					
+					if(paramItem[1].indexOf(',')==-1){
+						value = paramItem[1];
+					}else{
+						value = paramItem[1].split(',');
+					}
+					
+					params[name] = value;
+				}
+			}
+			
+			return Object.keys(params).length>0 ? params : null;
+		}
+	</script>
 </head>
 <body ng-app="starter">
 	<ion-side-menus enable-menu-with-back-views="false">

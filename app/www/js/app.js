@@ -6,11 +6,17 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'ngCordova']);
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters', 'ngCordova']);
+angular.module('starter.filters', []);
 angular.module('starter.controllers', []);
 angular.module('starter.services', [])
 .run(function($ionicPlatform, $rootScope, $ionicPopup, $cordovaDevice) {
+	$rootScope.VH_BASE_URL = 'http://app.des.validahora.com.br/ValidaHora/';
+	$rootScope.EA_BASE_URL = 'http://app.des.estiveaqui.com.br/EstiveAqui/';
+	
 	$ionicPlatform.ready(function() {
+		//console.log('UUID', window.device.uuid);
+		
 		// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
 		// for form inputs)
 		if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
@@ -64,6 +70,12 @@ angular.module('starter.services', [])
 		url: '/howwork',
 		templateUrl: 'templates/howwork.html',
 		controller: 'HowWorkCtrl',
+	})
+	
+	.state('activation', {
+		url: '/activation/:code',
+		templateUrl: 'templates/activation.html',
+		controller: 'ActivationTokenCtrl',
 	})
 	
 	.state('about', {

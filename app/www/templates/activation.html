@@ -1,0 +1,17 @@
+<ion-view view-title="Ativação">
+	<ion-content class="content has-header">
+		<div id="checkin-wrapper">
+			<div class="row">
+				<div class="col col-80 col-offset-10 inserir-codigo">
+					<img src="img/relogio.png" />
+					<input type="text" name="token" placeholder="Código de Ativação" ng-model="token.number" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col col-80 col-offset-10">
+					<button class="button button-block button-positive lancar-hora" ng-click="activate()">Ativar</button>
+				</div>
+			</div>
+		</div>
+	</ion-content>
+</ion-view>

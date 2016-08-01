@@ -11,7 +11,15 @@
 		</div> -->
 		<div class="row">
 			<div class="col">
-				<table>
+				<table ng-if="history.length<=0">
+					<tbody>
+						<tr>
+							<td>Ainda não há lancamentos para hoje</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<table ng-if="history.length>0">
 					<thead>
 						<tr>
 							<th>Local</th>
@@ -21,9 +29,9 @@
 					</thead>
 					<tbody>
 						<tr ng-repeat="item in history track by $index">
-							<td>{{item.place}}</td>
-							<td>{{item.hour}}</td>
-							<td>{{item.token}}</td>
+							<td>{{item.PA}}</td>
+							<td>{{item.HL | historyFormat}}</td>
+							<td>{{item.CD}}</td>
 						</tr>
 					</tbody>
 				</table>

@@ -1,8 +1,8 @@
 angular.module('starter.controllers')
-.controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate, OTP, TodayHistory){
-	$scope.toggleLeft = function(){
+.controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate, $ionicHistory, $state, OTP, EntryManager, PassClockManager, ApiValidaHora, TimeHelper, User){
+	/*$scope.toggleLeft = function(){
 		$ionicSideMenuDelegate.toggleLeft();
-	};
+	};*/
 	
 	$ionicModal.fromTemplateUrl('templates/history.html', {
 		scope: $scope,
@@ -10,6 +10,7 @@ angular.module('starter.controllers')
 	}).then(function(modal) {
 		$scope.modal = modal;
 	});
+	
 	$scope.displayHistory = function() {
 		$scope.modal.show();
 	};
@@ -27,7 +28,7 @@ angular.module('starter.controllers')
 		setTimeout(function(){
 			var bug = Connection.UNKNOW;
 			$scope.hasNetwork = $cordovaNetwork.isOnline();//$cordovaNetwork.getNetwork()!=Connection.NONE;
-		}, 0);
+		}, 1);
 	}
 	
 	$scope.toggleNetState = function(event, networkState){
@@ -55,35 +56,53 @@ angular.module('starter.controllers')
 	}
 	
 	$scope.registerToken = function(){
-		if(!$scope.token.place){
+		if(!$scope.token.clock){
 			$scope.simpleAlert('Erro', 'Selecione o local');
 		
 		}else if(!$scope.token.number){
 			$scope.simpleAlert('Erro', 'Código não pode ser vazio');
 		
-		}else if( !OTP.isEquals($scope.token.number) ){
+		/*}else if( !OTP.isEquals($scope.token.number) ){
 			$scope.simpleAlert('Erro', 'Código inválido');
 			
-		}else{
-			TodayHistory.add($scope.token.place, $scope.token.number, false);
+		*/}else{
+			/*TodayHistory.add($scope.token.clock, $scope.token.number, false);
 			$scope.displaySuccess();
 			$scope.token.number = null;
-			$scope.token.place = null;
-			$scope.syncCount = TodayHistory.getSyncCount();
+			$scope.token.clock = null;
+			$scope.syncCount = TodayHistory.getSyncCount();*/
+			
+			ApiValidaHora.calcHour($scope.token.clock, (('000000'+$scope.token.number).slice(-6)), TimeHelper.calcDate()).then(function(response){
+				$scope.displaySuccess();
+			})
 		}
 	}
 	
 	$rootScope.$on('$cordovaNetwork:online', $scope.toggleNetState);
 	$rootScope.$on('$cordovaNetwork:offline', $scope.toggleNetState);
 	
-	$scope.places = ['Casa', 'Sítio', 'Praia'];
-	
-	$scope.token = {number: null, place:null};
+	$scope.clocks = [];
+	$scope.token = {number: null, clock:null};
 	$scope.isShowMain = true;
 	$scope.isSuccess = false;
 	$scope.isError = false;
 	$scope.hasNetwork = false;
-	$scope.syncCount = TodayHistory.getSyncCount();
+	$scope.syncCount = 0;
 	
-	$scope.history = TodayHistory.getList();
+	$scope.history = EntryManager.get();
+	
+	$scope.$on("$ionicView.beforeEnter", function(event, data){
+	   if(!User.get().id){
+			$ionicHistory.nextViewOptions({
+					disableAnimate: false,
+					disableBack: true,
+					historyRoot: true,
+				});
+				$state.go('activation');
+		}
+		
+		$scope.clocks = PassClockManager.get();
+	});
+	
+	
 })

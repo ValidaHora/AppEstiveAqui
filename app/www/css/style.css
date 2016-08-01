@@ -1,6 +1,9 @@
-body, .pane, .view {
-	color: #DDD !important;
+body, .pane, .view, ion-view {
 	background: #000;
+}
+
+body, .pane, .view, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+	color: #DDD !important;
 }
 
 a { 
@@ -17,6 +20,7 @@ textarea {
 .popup {
 	color: #000;
 }
+
 .popup-head {
 	background-color: #184B68;
 	padding: 8px 10px;
@@ -24,6 +28,10 @@ textarea {
 .popup-head h3 {
 	color: #FFF;
 }
+
+/*.popup-body *{
+	color: #000 !important;
+}*/
 
 .text-center { text-align: center }
 

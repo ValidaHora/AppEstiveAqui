@@ -3,14 +3,22 @@ angular.module('starter.services')
 	var KEY_USER = 'user';
 	var user = {nickname: null, id: null};
 	
-	var set = function(nick, id){
-		user.nickname = nick;
+	var set = function(id, nick){
 		user.id = id;
+		user.nickname = nick;
 		LocalStorage.setObject(KEY_USER, user);
 	};
 	
 	var get = function(){
 		return user;
+	};
+	
+	var getId = function(){
+		return user.id;
+	};
+	
+	var getNickname = function(){
+		return user.nickname;
 	};
 	
 	if(LocalStorage.has(KEY_USER)){
@@ -20,5 +28,7 @@ angular.module('starter.services')
 	return {
 		set: set,
 		get: get,
+		getId: getId,
+		getNickname: getNickname,
 	}
 });

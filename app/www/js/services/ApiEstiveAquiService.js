@@ -2,12 +2,23 @@ angular.module('starter.services')
 
 .factory('ApiEstiveAqui', function($rootScope, ApiRequest, LocalStorage, PassClockManager, EntryManager, User, TimeHelper){
 	var register = function(code){
-		var KEY_ESTIVE_AQUI = 'estive_aqui';
-		var api = call('CadastraAppUsuario', {CODATIVACAO: code});
-		return api.request().then(function(response){
+		return call('CadastraAppUsuario', {CODATIVACAO: code}).request().then(function(response){
+			var id = response.IdentificadorAppUsuario;
+			var nick = response.Apelido;
+			if( id && nick ){
+				User.set(id, nick);
+				
+				return fetchUserData();
+			}else{
+				$rootScope.simpleAlert('Erro', 'Não foi possivel encontrar o Identificador');
+			}
+		});
+	};
+	
+	var fetchUserData = function(){
+		return call('LeAppUsuario', {IDAPP: User.getId()}).request().then(function(response){
 			PassClockManager.set(response.PassClocks);
 			EntryManager.set(response.Lancamentos);
-			User.set(response.Apelido, response.Identificador);
 			
 			return response;
 		});

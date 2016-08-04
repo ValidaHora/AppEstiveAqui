@@ -72,9 +72,9 @@ angular.module('starter.controllers')
 			$scope.token.clock = null;
 			$scope.syncCount = TodayHistory.getSyncCount();*/
 			
-			ApiValidaHora.calcHour($scope.token.clock, (('000000'+$scope.token.number).slice(-6)), TimeHelper.calcDate()).then(function(response){
-				$scope.displaySuccess();
-			})
+			$scope.displaySuccess();
+			/*ApiValidaHora.calcHour($scope.token.clock, (('000000'+$scope.token.number).slice(-6)), TimeHelper.calcDate()).then(function(response){
+			});*/
 		}
 	}
 	

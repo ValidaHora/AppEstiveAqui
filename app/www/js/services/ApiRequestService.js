@@ -1,6 +1,6 @@
 angular.module('starter.services')
 
-.factory('ApiRequest', function($rootScope, $http, $q, $ionicLoading, $ionicPopup, $cordovaFile, $cordovaFileTransfer){
+.factory('ApiRequest', function($rootScope, $http, $q, $ionicLoading, $ionicPopup, $cordovaFile, NetworkState, $cordovaFileTransfer){
 	var ApiRequest = function(){
 		var METHOD_GET = 'GET';
 		var METHOD_POST = 'POST';
@@ -15,6 +15,7 @@ angular.module('starter.services')
 		var debugmode = false;
 		var production = false;
 		var displayError = true;
+		var connectionCheck = true;
 		
 		var deferred = $q.defer();
 		var params = {};
@@ -124,6 +125,18 @@ angular.module('starter.services')
 			return debugmode && !production;
 		};
 		
+		var connectionCheck = function(check){
+			connectionCheck = check;
+		};
+		
+		var needConnecttionCheck = function(){
+			return connectionCheck;
+		};
+		
+		var isConnected = function(){
+			return NetworkState.isOnline();
+		};
+		
 		var reset = function(){
 			params = [];
 			method = METHOD_GET;
@@ -201,6 +214,14 @@ angular.module('starter.services')
 			var paramsSend = '';
 			var paramsFormated = '';
 			var targetUrl = getRequestUrl();
+			
+			if(needConnecttionCheck() && !isConnected()){
+				$ionicPopup.alert({
+					title: '<i class="icon ion-ios-information-outline"></i> Sem Conexão',
+					template: 'Você não esta conectado a internet, por favor verifique suas configurações',
+				});
+				return deferred.promise;
+			}
 			
 			if( !isSilent() )
 				displayLoader();

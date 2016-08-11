@@ -1,6 +1,6 @@
 angular.module('starter.services')
 .factory('PassClockManager', function(LocalStorage) {
-	var KEY_PASS_CLOCKS = 'pass_clocks';
+	var KEY_PASS_CLOCKS = 'vh_pass_clocks';
 	var list = [];
 	
 	var set = function(passclocks){

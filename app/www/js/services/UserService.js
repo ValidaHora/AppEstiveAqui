@@ -1,6 +1,6 @@
 angular.module('starter.services')
 .factory('User', function(LocalStorage) {
-	var KEY_USER = 'user';
+	var KEY_USER = 'vh_user';
 	var user = {nickname: null, id: null};
 	
 	var set = function(id, nick){

@@ -50,7 +50,7 @@ angular.module('starter.services')
 			date = strDate.substr(6, 2);
 			hour = strDate.substr(8, 2);
 			minute = strDate.substr(10, 12);
-			minute = strDate.substr(12);
+			second = strDate.substr(12);
 			
 		}else if(strDate.length==14){
 			year = strDate.substr(0, 4);
@@ -60,7 +60,7 @@ angular.module('starter.services')
 			minute = strDate.substr(10, 12);
 		}
 		
-		return new Date(year, month, date, hour, minute, second, milisecond);
+		return new Date(year, month-1, date, hour, minute, second, milisecond);
 	};
 	
 	timezone = getTimeZone();
@@ -70,5 +70,6 @@ angular.module('starter.services')
 		entryDate: entryDate,
 		calcDate: calcDate,
 		toDate: toDate,
+		pad: pad,
 	}
 });

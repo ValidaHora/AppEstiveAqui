@@ -51,7 +51,7 @@ angular.module('starter.services').factory('TodayHistory', function(LocalStorage
 		LocalStorage.setObject(KEY_TODAY, history);
 	}
 	
-	var KEY_TODAY = 'history_today';
+	var KEY_TODAY = 'vh_history_today';
 	var dateNow = null;
 	var dateHistory = null;
 	var history = {

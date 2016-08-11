@@ -1,6 +1,6 @@
 angular.module('starter.services')
 
-.factory('ApiValidaHora', function($rootScope, ApiRequest, TimeHelper){
+.factory('ApiValidaHora', function($rootScope, ApiRequest, TimeHelper, User){
 	
 	var calcHour = function(tokenID, code, hdg){
 		/*
@@ -11,6 +11,7 @@ angular.module('starter.services')
 		return call('CalculaHora', {
 			CLI: 'EstiveAqui',
 			SEN: 'Teste',
+			AP: User.getNickname(),
 			TOK: tokenID,
 			COD: code,
 			HDG: hdg,

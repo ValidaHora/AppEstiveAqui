@@ -1,6 +1,6 @@
 angular.module('starter.services')
 
-.factory('ApiEstiveAqui', function($rootScope, ApiRequest, LocalStorage, PassClockManager, EntryManager, User, TimeHelper){
+.factory('ApiEstiveAqui', function($rootScope, ApiRequest, LocalStorage, PassClockManager, EntryManager, ApiValidaHora, User, TimeHelper){
 	var register = function(code){
 		return call('CadastraAppUsuario', {CODATIVACAO: code}).request().then(function(response){
 			var id = response.IdentificadorAppUsuario;
@@ -24,6 +24,33 @@ angular.module('starter.services')
 		});
 	};
 	
+	var launchHour = function(tokenID, code, horaDigitada, horaLancada, hashCode){
+		var data = {
+			IDAPP: User.getId(),
+			IDDISPOSITIVO: 'Teste',			
+			NUMPASSCLOCK: tokenID,
+			HRDG: horaDigitada,
+			HREN: TimeHelper.calcDate(),
+			HRLN: horaLancada+(horaLancada.length<14?'00':''),
+			HC: hashCode,
+			CD: code,
+			LAT: 89,
+			LON: 10,			
+		};
+		
+		return call('LancaHora', data).request().then(function(response){
+			
+			
+			return response;
+		});
+	};
+	
+	var registerToken = function(tokenID, code, horaDigitada){
+		return ApiValidaHora.calcHour(tokenID, code, horaDigitada).then(function(response){
+			return launchHour(tokenID, code, horaDigitada, response.HoraLancada, response.HashCode);					
+		});
+	}
+	
 	var call = function(endpoint, params){
 		var api = new ApiRequest();
 		api.isAutoError(true);
@@ -39,5 +66,7 @@ angular.module('starter.services')
 	
 	return {
 		register: register,
+		fetchUserData: fetchUserData,
+		registerToken: registerToken,
 	};
 });

@@ -1,5 +1,5 @@
 angular.module('starter.controllers')
-.controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate, $ionicHistory, $state, OTP, EntryManager, PassClockManager, ApiValidaHora, TimeHelper, User){
+.controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate, $ionicHistory, $state, $timeout, NetworkState, OTP, EntryManager, PassClockManager, ApiValidaHora, ApiEstiveAqui, TimeHelper, User){
 	/*$scope.toggleLeft = function(){
 		$ionicSideMenuDelegate.toggleLeft();
 	};*/
@@ -22,18 +22,13 @@ angular.module('starter.controllers')
 	$scope.$on('$destroy', function() {
 		$scope.modal.remove();
 	});
-	
-	if(!$scope.isWeb){
-		//BUG objeto Connection so fica disponivel depois do settimeout
-		setTimeout(function(){
-			var bug = Connection.UNKNOW;
-			$scope.hasNetwork = $cordovaNetwork.isOnline();//$cordovaNetwork.getNetwork()!=Connection.NONE;
-		}, 1);
-	}
-	
-	$scope.toggleNetState = function(event, networkState){
-		console.log('network state changed to:', networkState);
-		var has = $cordovaNetwork.isOnline();//networkState != 'none';//navigator.connection.type.NONE;
+		
+	$scope.toggleNetState = function(event, netState){
+		var has = NetworkState.isOnline();//networkState != 'none';//navigator.connection.type.NONE;
+		if(has){
+			$scope.fetch();
+		}
+		
 		$scope.hasNetwork = has;
 	}
 	
@@ -43,10 +38,13 @@ angular.module('starter.controllers')
 		$scope.isError = false;
 	}
 	
-	$scope.displayError = function(){
+	$scope.displayError = function(title, message){
 		$scope.isShowMain = false;
 		$scope.isSuccess = false;
 		$scope.isError = true;
+		
+		$scope.errorTitle = title;
+		$scope.errorMessage = message;
 	}
 	
 	$scope.displayMain = function(){
@@ -55,54 +53,90 @@ angular.module('starter.controllers')
 		$scope.isError = false;
 	}
 	
+	$scope.fetch = function(){
+		ApiEstiveAqui.fetchUserData().then(function(){
+			$scope.history = EntryManager.get();
+		});
+	}
+	
 	$scope.registerToken = function(){
+		//$scope.displaySuccess();
 		if(!$scope.token.clock){
 			$scope.simpleAlert('Erro', 'Selecione o local');
 		
 		}else if(!$scope.token.number){
 			$scope.simpleAlert('Erro', 'Código não pode ser vazio');
 		
-		/*}else if( !OTP.isEquals($scope.token.number) ){
-			$scope.simpleAlert('Erro', 'Código inválido');
+		}else if( !tokenValidation() ){
+			$scope.displayError('Código inválido. Verifique se o passclock é o correto.', 'Clique no botão abaixo para lançar sua hora.');
+			//$scope.simpleAlert('Erro', 'Código inválido');
 			
-		*/}else{
-			/*TodayHistory.add($scope.token.clock, $scope.token.number, false);
-			$scope.displaySuccess();
+		}else{
+			var horaDigitada = TimeHelper.calcDate();
+			var token = padToken();
+			
+			if($scope.hasNetwork){
+				ApiEstiveAqui.registerToken($scope.token.clock, token, horaDigitada).then(function(response){
+					EntryManager.add(response.Lancamento);
+					$scope.displaySuccess();
+				});
+			}else{
+				$scope.displayError('Sem conexão. Você não tem nenhuma conexão ativa.', 'Não se preocupe, essa hora foi registrada e você pode envia-la assim que tiver conexão clicando no icone de relógio no canto superior');
+				EntryManager.schedule($scope.token.clock, token, horaDigitada);
+				$scope.syncCount ++;
+			}
+			
 			$scope.token.number = null;
 			$scope.token.clock = null;
-			$scope.syncCount = TodayHistory.getSyncCount();*/
-			
-			$scope.displaySuccess();
-			/*ApiValidaHora.calcHour($scope.token.clock, (('000000'+$scope.token.number).slice(-6)), TimeHelper.calcDate()).then(function(response){
-			});*/
 		}
 	}
 	
-	$rootScope.$on('$cordovaNetwork:online', $scope.toggleNetState);
-	$rootScope.$on('$cordovaNetwork:offline', $scope.toggleNetState);
+	$scope.sync = function(){};
+	
+	var padToken = function(){
+		return (('000000'+$scope.token.number).slice(-6));
+	}
+	
+	var tokenValidation = function(){
+		var date = new Date();
+		var validToken = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());
+		var token = padToken();
+		
+		return validToken == token;
+	};
 	
 	$scope.clocks = [];
 	$scope.token = {number: null, clock:null};
 	$scope.isShowMain = true;
 	$scope.isSuccess = false;
 	$scope.isError = false;
+	$scope.errorTitle = null;
+	$scope.errorMessage = null;
 	$scope.hasNetwork = false;
-	$scope.syncCount = 0;
-	
-	$scope.history = EntryManager.get();
+	$scope.syncCount = EntryManager.getSync().length;
+	$scope.history = [];//EntryManager.get();
+	$scope.isLoged = User.get().id!=undefined;
 	
 	$scope.$on("$ionicView.beforeEnter", function(event, data){
-	   if(!User.get().id){
-			$ionicHistory.nextViewOptions({
-					disableAnimate: false,
-					disableBack: true,
-					historyRoot: true,
-				});
-				$state.go('activation');
+	   if(!$scope.isLoged){
+	   		$ionicHistory.nextViewOptions({
+				disableAnimate: false,
+				disableBack: true,
+				historyRoot: true,
+			});
+			$state.go('activation');
 		}
 		
 		$scope.clocks = PassClockManager.get();
 	});
 	
+	if(!$scope.isWeb){
+		$scope.hasNetwork = NetworkState.isOnline();
+		
+		if($scope.hasNetwork && $scope.isLoged)
+			$scope.fetch();
+	}
 	
+	$rootScope.$on('NetworkState:online', $scope.toggleNetState);
+	$rootScope.$on('NetworkState:offline', $scope.toggleNetState);
 })

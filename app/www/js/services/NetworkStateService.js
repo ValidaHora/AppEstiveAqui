@@ -13,7 +13,6 @@ angular.module('starter.services')
 	
 	
 	var isOnline = function(){
-		console.log('navigator.connection.type = '+navigator.connection.type);
 		return navigator.connection.type!=NONE;
 	};
 	
@@ -32,9 +31,13 @@ angular.module('starter.services')
 	};
 	
 	function checkNavigator(){
-		if($rootScope.isWeb){
-			navigator.connection = {type:WIFI};
+		if(!navigator.connection){
+			navigator.connection = {type: WIFI};
 		}
+		
+		/*if($rootScope.isWeb){
+			navigator.connection = {type:WIFI};
+		}*/
 	}
 	checkNavigator();
 	

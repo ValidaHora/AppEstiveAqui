@@ -12,13 +12,13 @@
 	<ion-content class="content has-header">
 		<div id="checkin-wrapper" ng-if="isShowMain">
 			<!-- Exibir esta row quando houver mais de um token por usuário -->
-			<div class="list local">
-				<label class="item item-input item-select">
+			<div class="list local" ng-if="clocks.length>1">
+				<label class="item item-input item-select" >
 					<div class="input-label">
 						Lançando hora em
 					</div>
-					<select ng-model="token.clock">
-						<option ng-repeat="clock in clocks" value="{{clock.NumeroPassClock}}">{{clock.Apelido}}</option>
+					<select ng-model="token.clock" ng-options="clock.NumeroPassClock as clock.Apelido for clock in clocks">
+						<!-- <option ng-repeat="clock in clocks" value="{{clock.NumeroPassClock}}">{{clock.Apelido}}</option> -->
 					</select>
 				</label>
 			</div>
@@ -31,7 +31,7 @@
 			</div>
 			<div class="row">
 				<div class="col col-80 col-offset-10">
-					<button class="button button-block button-positive lancar-hora" ng-click="registerToken()">Lançar hora</button>
+					<button class="button button-block button-positive lancar-hora" ng-click="registerToken()" ng-disabled="!readyToLaunch">Lançar hora</button>
 				</div>
 			</div>
 			<div class="row">

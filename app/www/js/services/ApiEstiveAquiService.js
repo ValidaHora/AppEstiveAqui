@@ -31,11 +31,11 @@ angular.module('starter.services')
 			NUMPASSCLOCK: tokenID,
 			HRDG: horaDigitada,
 			HREN: TimeHelper.calcDate(),
-			HRLN: horaLancada+(horaLancada.length<14?'00':''),
+			HRLN: horaLancada,
 			HC: hashCode,
 			CD: code,
-			LAT: 89,
-			LON: 10,			
+			LATITUDE: 89,
+			LONGITUDE: 10,
 		};
 		
 		return call('LancaHora', data).request().then(function(response){

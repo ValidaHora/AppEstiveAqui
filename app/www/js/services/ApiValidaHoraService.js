@@ -16,8 +16,8 @@ angular.module('starter.services')
 			COD: code,
 			HDG: hdg,
 			HEN: TimeHelper.calcDate(),
-			LAT: 89,
-			LON: 10,
+			LATITUDE: 89,
+			LONGITUDE: 10,
 		}).request();
 	}
 	

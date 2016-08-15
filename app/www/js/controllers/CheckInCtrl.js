@@ -56,6 +56,7 @@ angular.module('starter.controllers')
 	$scope.fetch = function(){
 		ApiEstiveAqui.fetchUserData().then(function(){
 			$scope.history = EntryManager.get();
+			$scope.token.clock = EntryManager.getSelection();
 		});
 	}
 	
@@ -78,6 +79,8 @@ angular.module('starter.controllers')
 			if($scope.hasNetwork){
 				ApiEstiveAqui.registerToken($scope.token.clock, token, horaDigitada).then(function(response){
 					EntryManager.add(response.Lancamento);
+					EntryManager.setSelection($scope.token.clock);
+					$scope.history.push(response.Lancamento);
 					$scope.displaySuccess();
 				});
 			}else{
@@ -87,7 +90,6 @@ angular.module('starter.controllers')
 			}
 			
 			$scope.token.number = null;
-			$scope.token.clock = null;
 		}
 	}
 	
@@ -105,17 +107,19 @@ angular.module('starter.controllers')
 		return validToken == token;
 	};
 	
-	$scope.clocks = [];
-	$scope.token = {number: null, clock:null};
-	$scope.isShowMain = true;
-	$scope.isSuccess = false;
-	$scope.isError = false;
-	$scope.errorTitle = null;
+	var selected = EntryManager.getSelection();
+	$scope.clocks 		= [];
+	$scope.token 		= {number: null, clock:selected};
+	$scope.readyToLaunch= false;
+	$scope.isShowMain 	= true;
+	$scope.isSuccess 	= false;
+	$scope.isError 		= false;
+	$scope.errorTitle 	= null;
 	$scope.errorMessage = null;
-	$scope.hasNetwork = false;
-	$scope.syncCount = EntryManager.getSync().length;
-	$scope.history = [];//EntryManager.get();
-	$scope.isLoged = User.get().id!=undefined;
+	$scope.hasNetwork 	= false;
+	$scope.syncCount 	= EntryManager.getSync().length;
+	$scope.history 		= [];
+	$scope.isLoged 		= User.get().id!=undefined;
 	
 	$scope.$on("$ionicView.beforeEnter", function(event, data){
 	   if(!$scope.isLoged){
@@ -133,10 +137,19 @@ angular.module('starter.controllers')
 	if(!$scope.isWeb){
 		$scope.hasNetwork = NetworkState.isOnline();
 		
-		if($scope.hasNetwork && $scope.isLoged)
-			$scope.fetch();
+		/*if($scope.hasNetwork && $scope.isLoged)
+			$scope.fetch();*/
+	}else{
+		$scope.hasNetwork = true;
 	}
 	
+	$scope.$watch('token.number', function(newValue, oldValue) {
+		newValue = newValue+'';
+		$scope.readyToLaunch = newValue && newValue.length>=6;
+		if($scope.readyToLaunch){
+			$scope.token.number = parseInt(newValue.substr(0, 6));
+		}
+	});
 	$rootScope.$on('NetworkState:online', $scope.toggleNetState);
 	$rootScope.$on('NetworkState:offline', $scope.toggleNetState);
 })

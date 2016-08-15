@@ -2,8 +2,10 @@ angular.module('starter.services')
 .factory('EntryManager', function(LocalStorage) {
 	var KEY_ENTRIES = 'vh_pass_clocks_entries';
 	var KEY_ENTRIES_SYNC = 'vh_pass_clocks_entries_sync';
+	var KEY_ENTRIES_SELECTED = 'vh_pass_clocks_selected';
 	var entries = [];
 	var sync = [];
+	var selected = null;
 	
 	var set = function(passclocks){
 		entries = passclocks;
@@ -12,6 +14,15 @@ angular.module('starter.services')
 	
 	var get = function(){
 		return entries;
+	};
+	
+	var setSelection = function(selection){
+		selected = selection;
+		save();
+	};
+	
+	var getSelection = function(selection){
+		return selected;
 	};
 	
 	var add = function(lancamento){
@@ -55,6 +66,7 @@ angular.module('starter.services')
 	var save = function(){
 		LocalStorage.setObject(KEY_ENTRIES, entries);
 		LocalStorage.setObject(KEY_ENTRIES_SYNC, sync);
+		LocalStorage.set(KEY_ENTRIES_SELECTED, selected);
 	};
 	
 	var load = function(){
@@ -64,6 +76,10 @@ angular.module('starter.services')
 		
 		if(LocalStorage.has(KEY_ENTRIES_SYNC)){
 			sync = LocalStorage.getObject(KEY_ENTRIES_SYNC);
+		};
+		
+		if(LocalStorage.has(KEY_ENTRIES_SELECTED)){
+			selected = LocalStorage.get(KEY_ENTRIES_SELECTED);
 		};
 	}
 	
@@ -76,5 +92,7 @@ angular.module('starter.services')
 		schedule: schedule,
 		findById: findById,
 		findByClock: findByClock,
+		setSelection: setSelection,
+		getSelection: getSelection,
 	}
 });

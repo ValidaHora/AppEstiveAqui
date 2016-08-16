@@ -131,6 +131,20 @@ angular.module('starter.controllers')
 	$scope.history 		= [];
 	$scope.isLoged 		= User.get().id!=undefined;
 	
+	if(!$scope.isWeb){
+		$scope.hasNetwork = NetworkState.isOnline();
+		
+		/*if($scope.hasNetwork && $scope.isLoged)
+			$scope.fetch();*/
+	}else{
+		$scope.hasNetwork = true;
+	}
+	
+	/*setTimeout(function(){
+		document.getElementById('code').focus();
+		console.log('focus');
+	}, 5000);*/
+		
 	$scope.$on("$ionicView.beforeEnter", function(event, data){
 	   if(!$scope.isLoged){
 	   		$ionicHistory.nextViewOptions({
@@ -144,14 +158,7 @@ angular.module('starter.controllers')
 		$scope.clocks = PassClockManager.get();
 	});
 	
-	if(!$scope.isWeb){
-		$scope.hasNetwork = NetworkState.isOnline();
-		
-		/*if($scope.hasNetwork && $scope.isLoged)
-			$scope.fetch();*/
-	}else{
-		$scope.hasNetwork = true;
-	}
+	
 	
 	$scope.$watch('token.number', function(newValue, oldValue) {
 		newValue = newValue+'';
@@ -160,6 +167,7 @@ angular.module('starter.controllers')
 			$scope.token.number = parseInt(newValue.substr(0, 6));
 		}
 	});
+	
 	$rootScope.$on('NetworkState:online', $scope.toggleNetState);
 	$rootScope.$on('NetworkState:offline', $scope.toggleNetState);
 })

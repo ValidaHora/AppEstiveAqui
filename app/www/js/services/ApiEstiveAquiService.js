@@ -24,7 +24,7 @@ angular.module('starter.services')
 		});
 	};
 	
-	var launchHour = function(tokenID, code, horaDigitada, horaLancada, hashCode){
+	var launchHour = function(tokenID, code, horaDigitada, horaLancada, hashCode, position){
 		var data = {
 			IDAPP: User.getId(),
 			IDDISPOSITIVO: 'Teste',			
@@ -34,8 +34,8 @@ angular.module('starter.services')
 			HRLN: horaLancada,
 			HC: hashCode,
 			CD: code,
-			LATITUDE: 89,
-			LONGITUDE: 10,
+			LATITUDE: position.coords.latitude,
+			LONGITUDE: position.coords.longitude,
 		};
 		
 		return call('LancaHora', data).request().then(function(response){
@@ -45,9 +45,9 @@ angular.module('starter.services')
 		});
 	};
 	
-	var registerToken = function(tokenID, code, horaDigitada){
-		return ApiValidaHora.calcHour(tokenID, code, horaDigitada).then(function(response){
-			return launchHour(tokenID, code, horaDigitada, response.HoraLancada, response.HashCode);					
+	var registerToken = function(tokenID, code, horaDigitada, position){
+		return ApiValidaHora.calcHour(tokenID, code, horaDigitada, position).then(function(response){
+			return launchHour(tokenID, code, horaDigitada, response.HoraLancada, response.HashCode, position);					
 		});
 	}
 	

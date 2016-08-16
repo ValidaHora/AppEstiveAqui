@@ -2,7 +2,7 @@ angular.module('starter.services')
 
 .factory('ApiValidaHora', function($rootScope, ApiRequest, TimeHelper, User){
 	
-	var calcHour = function(tokenID, code, hdg){
+	var calcHour = function(tokenID, code, hdg, position){
 		/*
 		HDG – Hora digitada, momento da digitação da hora
 		HEN – Hora enviada, momento do envio da hora
@@ -16,8 +16,8 @@ angular.module('starter.services')
 			COD: code,
 			HDG: hdg,
 			HEN: TimeHelper.calcDate(),
-			LATITUDE: 89,
-			LONGITUDE: 10,
+			LATITUDE: position.coords.latitude,
+			LONGITUDE: position.coords.longitude,
 		}).request();
 	}
 	

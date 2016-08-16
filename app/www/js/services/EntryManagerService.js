@@ -34,11 +34,12 @@ angular.module('starter.services')
 		return sync;
 	};
 	
-	var schedule = function(clock, code, typeTime){
+	var schedule = function(clock, code, typeTime, position){
 		sync.push({
 			clock: clock,
 			code: code,
 			typeTime: typeTime,
+			position: position,
 		});
 		save();
 	}
@@ -66,7 +67,9 @@ angular.module('starter.services')
 	var save = function(){
 		LocalStorage.setObject(KEY_ENTRIES, entries);
 		LocalStorage.setObject(KEY_ENTRIES_SYNC, sync);
-		LocalStorage.set(KEY_ENTRIES_SELECTED, selected);
+		
+		if(selected)
+			LocalStorage.set(KEY_ENTRIES_SELECTED, selected);
 	};
 	
 	var load = function(){

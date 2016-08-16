@@ -1,5 +1,5 @@
 angular.module('starter.controllers')
-.controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate, $ionicHistory, $state, $timeout, NetworkState, OTP, EntryManager, PassClockManager, ApiValidaHora, ApiEstiveAqui, TimeHelper, User){
+.controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate, $ionicHistory, $state, $ionicLoading, $cordovaGeolocation, NetworkState, OTP, EntryManager, PassClockManager, ApiValidaHora, ApiEstiveAqui, TimeHelper, User){
 	/*$scope.toggleLeft = function(){
 		$ionicSideMenuDelegate.toggleLeft();
 	};*/
@@ -76,20 +76,29 @@ angular.module('starter.controllers')
 			var horaDigitada = TimeHelper.calcDate();
 			var token = padToken();
 			
-			if($scope.hasNetwork){
-				ApiEstiveAqui.registerToken($scope.token.clock, token, horaDigitada).then(function(response){
-					EntryManager.add(response.Lancamento);
-					EntryManager.setSelection($scope.token.clock);
-					$scope.history.push(response.Lancamento);
-					$scope.displaySuccess();
-				});
-			}else{
-				$scope.displayError('Sem conexão. Você não tem nenhuma conexão ativa.', 'Não se preocupe, essa hora foi registrada e você pode envia-la assim que tiver conexão clicando no icone de relógio no canto superior');
-				EntryManager.schedule($scope.token.clock, token, horaDigitada);
-				$scope.syncCount ++;
-			}
+			$ionicLoading.show();
+			$cordovaGeolocation.getCurrentPosition({enableHighAccuracy:false}).then(function(pos){
+				$scope.position = pos;
+				if($scope.hasNetwork){
+					ApiEstiveAqui.registerToken($scope.token.clock, token, horaDigitada, $scope.position).then(function(response){
+						EntryManager.add(response.Lancamento);
+						EntryManager.setSelection($scope.token.clock);
+						$scope.history.push(response.Lancamento);
+						$scope.displaySuccess();
+					}).finally(function(){
+						$scope.token.number = null;
+					});
+				}else{
+					$scope.displayError('Sem conexão. Você não tem nenhuma conexão ativa.', 'Não se preocupe, essa hora foi registrada e você pode envia-la assim que tiver conexão clicando no icone de relógio no canto superior');
+					EntryManager.schedule($scope.token.clock, token, horaDigitada, $scope.position);
+					$scope.syncCount ++;
+					$scope.token.number = null;
+				}
+			}, function(){
+				$ionicLoading.hide();
+			});
 			
-			$scope.token.number = null;
+			
 		}
 	}
 	
@@ -117,6 +126,7 @@ angular.module('starter.controllers')
 	$scope.errorTitle 	= null;
 	$scope.errorMessage = null;
 	$scope.hasNetwork 	= false;
+	$scope.position		= {coords:{latitude:0,longitude:0}};
 	$scope.syncCount 	= EntryManager.getSync().length;
 	$scope.history 		= [];
 	$scope.isLoged 		= User.get().id!=undefined;

@@ -34,15 +34,25 @@ angular.module('starter.services')
 		return sync;
 	};
 	
-	var schedule = function(clock, code, typeTime, position){
-		sync.push({
-			clock: clock,
-			code: code,
-			typeTime: typeTime,
-			position: position,
-		});
+	var schedule = function(data){
+		var index = sync.length-1;
+		var last = sync[index];
+		if(
+			index > -1 && (
+				last.token.code==data.token.code ||
+				last.typedTime==data.typedTime
+			)
+		){
+			sync[index] = data;
+		}else{
+			sync.push(data);
+		}
+		
+		
 		save();
-	}
+	};
+	
+	var reschedule = function(data){};
 	
 	var find = function(term, field){
 		var clock = null;
@@ -93,6 +103,7 @@ angular.module('starter.services')
 		add: add,
 		getSync: getSync,
 		schedule: schedule,
+		reschedule: reschedule,
 		findById: findById,
 		findByClock: findByClock,
 		setSelection: setSelection,

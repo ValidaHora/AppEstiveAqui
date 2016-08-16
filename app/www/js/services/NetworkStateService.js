@@ -32,7 +32,8 @@ angular.module('starter.services')
 	
 	function checkNavigator(){
 		if(!navigator.connection){
-			navigator.connection = {type: WIFI};
+			//navigator.connection = {type: WIFI};
+			navigator.connection = {type: NONE};
 		}
 		
 		/*if($rootScope.isWeb){

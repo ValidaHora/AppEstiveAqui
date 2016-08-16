@@ -56,16 +56,16 @@ angular.module('starter.controllers')
 	$scope.fetch = function(){
 		ApiEstiveAqui.fetchUserData().then(function(){
 			$scope.history = EntryManager.get();
-			$scope.token.clock = EntryManager.getSelection();
+			$scope.registerData.token.clock = EntryManager.getSelection();
 		});
 	}
 	
 	$scope.registerToken = function(){
 		//$scope.displaySuccess();
-		if(!$scope.token.clock){
+		if(!$scope.registerData.token.clock){
 			$scope.simpleAlert('Erro', 'Selecione o local');
 		
-		}else if(!$scope.token.number){
+		}else if(!$scope.registerData.token.code){
 			$scope.simpleAlert('Erro', 'Código não pode ser vazio');
 		
 		}else if( !tokenValidation() ){
@@ -73,39 +73,62 @@ angular.module('starter.controllers')
 			//$scope.simpleAlert('Erro', 'Código inválido');
 			
 		}else{
-			var horaDigitada = TimeHelper.calcDate();
-			var token = padToken();
+			$scope.registerData.typedTime = TimeHelper.calcDate();
+			$scope.registerData.token.code = padToken();
 			
 			$ionicLoading.show();
 			$cordovaGeolocation.getCurrentPosition({enableHighAccuracy:false}).then(function(pos){
-				$scope.position = pos;
+				$scope.registerData.position.coords.latitude = pos.coords.latitude;
+				$scope.registerData.position.coords.longitude = pos.coords.longitude;
+				
 				if($scope.hasNetwork){
-					ApiEstiveAqui.registerToken($scope.token.clock, token, horaDigitada, $scope.position).then(function(response){
-						EntryManager.add(response.Lancamento);
-						EntryManager.setSelection($scope.token.clock);
-						$scope.history.push(response.Lancamento);
+					ApiValidaHora.calcHour($scope.registerData.token.clock, $scope.registerData.token.code, $scope.registerData.typedTime, $scope.registerData.position).then(function(calculated){
+						$scope.registerData.launchTime = calculated.HoraLancada;
+						$scope.registerData.hashCode = calculated.HashCode;
 						$scope.displaySuccess();
-					}).finally(function(){
-						$scope.token.number = null;
 					});
 				}else{
-					$scope.displayError('Sem conexão. Você não tem nenhuma conexão ativa.', 'Não se preocupe, essa hora foi registrada e você pode envia-la assim que tiver conexão clicando no icone de relógio no canto superior');
-					EntryManager.schedule($scope.token.clock, token, horaDigitada, $scope.position);
-					$scope.syncCount ++;
-					$scope.token.number = null;
+					//EntryManager.schedule($scope.registerData);
+					$ionicLoading.hide();
+					$scope.displaySuccess();
 				}
 			}, function(){
 				$ionicLoading.hide();
+				$scope.simpleAlert('Não foi possivel obter a sua localização.');
+			});			
+		}
+	}
+	
+	$scope.launchHour = function(){		
+		if($scope.hasNetwork){
+			ApiEstiveAqui.launchHour(
+				$scope.registerData.token.clock,
+				$scope.registerData.token.code,
+				$scope.registerData.typedTime,
+				$scope.registerData.launchTime,
+				$scope.registerData.hashCode,
+				$scope.registerData.position,
+				$scope.registerData.note
+			).then(function(launched){
+				EntryManager.add(launched.Lancamento);
+				EntryManager.setSelection($scope.registerData.token.clock);
+				$scope.history.push(launched.Lancamento);
+				
+				$scope.displayMain();
+				resetRegister();
 			});
-			
-			
+		}else{
+			$scope.displayError('Sem conexão. Você não tem nenhuma conexão ativa.', 'Não se preocupe, essa hora foi registrada e você pode envia-la assim que tiver conexão clicando no icone de relógio no canto superior');
+			EntryManager.schedule($scope.registerData);
+			$scope.syncCount ++;
+			resetRegister();
 		}
 	}
 	
 	$scope.sync = function(){};
 	
 	var padToken = function(){
-		return (('000000'+$scope.token.number).slice(-6));
+		return (('000000'+$scope.registerData.token.code).slice(-6));
 	}
 	
 	var tokenValidation = function(){
@@ -116,9 +139,12 @@ angular.module('starter.controllers')
 		return validToken == token;
 	};
 	
+	var resetRegister = function(){
+		$scope.registerData = { token:{code: null, clock:selected}, note: null, position:{coords:{latitude:0,longitude:0}}, typedTime:null, launchTime:null, hashCode:null };
+	};
+	
 	var selected = EntryManager.getSelection();
 	$scope.clocks 		= [];
-	$scope.token 		= {number: null, clock:selected};
 	$scope.readyToLaunch= false;
 	$scope.isShowMain 	= true;
 	$scope.isSuccess 	= false;
@@ -126,18 +152,19 @@ angular.module('starter.controllers')
 	$scope.errorTitle 	= null;
 	$scope.errorMessage = null;
 	$scope.hasNetwork 	= false;
-	$scope.position		= {coords:{latitude:0,longitude:0}};
 	$scope.syncCount 	= EntryManager.getSync().length;
 	$scope.history 		= [];
 	$scope.isLoged 		= User.get().id!=undefined;
+	$scope.registerData = {};
 	
+	resetRegister();
 	if(!$scope.isWeb){
 		$scope.hasNetwork = NetworkState.isOnline();
 		
 		/*if($scope.hasNetwork && $scope.isLoged)
 			$scope.fetch();*/
 	}else{
-		$scope.hasNetwork = true;
+		$scope.hasNetwork = false;
 	}
 	
 	/*setTimeout(function(){
@@ -160,11 +187,11 @@ angular.module('starter.controllers')
 	
 	
 	
-	$scope.$watch('token.number', function(newValue, oldValue) {
+	$scope.$watch('registerData.token.code', function(newValue, oldValue) {
 		newValue = newValue+'';
 		$scope.readyToLaunch = newValue && newValue.length>=6;
 		if($scope.readyToLaunch){
-			$scope.token.number = parseInt(newValue.substr(0, 6));
+			$scope.registerData.token.code = parseInt(newValue.substr(0, 6));
 		}
 	});
 	

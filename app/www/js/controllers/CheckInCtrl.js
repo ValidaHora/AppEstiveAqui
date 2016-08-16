@@ -99,7 +99,10 @@ angular.module('starter.controllers')
 		}
 	}
 	
-	$scope.launchHour = function(){		
+	$scope.launchHour = function(){
+		var title = 'Sucesso';
+		var msg = 'Hora lançada com sucesso!';
+		
 		if($scope.hasNetwork){
 			ApiEstiveAqui.launchHour(
 				$scope.registerData.token.clock,
@@ -116,12 +119,14 @@ angular.module('starter.controllers')
 				
 				$scope.displayMain();
 				resetRegister();
+				$scope.simpleAlert(title, msg);
 			});
 		}else{
 			$scope.displayError('Sem conexão. Você não tem nenhuma conexão ativa.', 'Não se preocupe, essa hora foi registrada e você pode envia-la assim que tiver conexão clicando no icone de relógio no canto superior');
 			EntryManager.schedule($scope.registerData);
 			$scope.syncCount ++;
 			resetRegister();
+			$scope.simpleAlert(title, msg);
 		}
 	}
 	
@@ -166,11 +171,6 @@ angular.module('starter.controllers')
 	}else{
 		$scope.hasNetwork = false;
 	}
-	
-	/*setTimeout(function(){
-		document.getElementById('code').focus();
-		console.log('focus');
-	}, 5000);*/
 		
 	$scope.$on("$ionicView.beforeEnter", function(event, data){
 	   if(!$scope.isLoged){

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	
+	<script type="text/javascript" src="sha1.js"></script>
+	<script type="text/javascript" src="TOTP.js"></script>
+	<script type="text/javascript">
+		var seed = 'BBC123ABC123ABC3ABC123ABC123ABC3ABC123ABC123ABC3ABC123ABC123ABC3';
+		var date = new Date();
+		
+		var code = getCodigo(seed, date.getUTCMinutes());
+		document.writeln(code);
+	</script>
+</head>
+<body>
+	
+</body>
+</html>

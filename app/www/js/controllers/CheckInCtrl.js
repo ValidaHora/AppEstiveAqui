@@ -138,8 +138,8 @@ angular.module('starter.controllers')
 	
 	var tokenValidation = function(){
 		var token = padToken();
-		/*var date = new Date();
-		var validToken = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());*/
+		var date = new Date();
+		//var validToken = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());
 		var validToken = OTP.getOtpCode();
 		
 		return validToken == token;
@@ -157,7 +157,7 @@ angular.module('starter.controllers')
 	$scope.isError 		= false;
 	$scope.errorTitle 	= null;
 	$scope.errorMessage = null;
-	$scope.hasNetwork 	= true;
+	$scope.hasNetwork 	= false;
 	$scope.syncCount 	= EntryManager.getSync().length;
 	$scope.history 		= [];
 	$scope.isLoged 		= User.get().id!=undefined;
@@ -172,7 +172,7 @@ angular.module('starter.controllers')
 		/*if($scope.hasNetwork && $scope.isLoged)
 			$scope.fetch();*/
 	}else{
-		$scope.hasNetwork = false;
+		$scope.hasNetwork = true;
 	}
 		
 	$scope.$on("$ionicView.beforeEnter", function(event, data){
@@ -190,17 +190,28 @@ angular.module('starter.controllers')
 	});
 	
 	
-	
+	var isZeroStart = false;
 	$scope.$watch('registerData.token.code', function(newValue, oldValue) {
 		newValue = newValue+'';
+		//oldValue = oldValue+'';
+		if(newValue=='0'){
+			//newValue = '0'+newValue;
+			isZeroStart = true;
+		}else if(newValue=='null'){
+			isZeroStart = false;
+		}
+		
+		if(isZeroStart)
+			newValue = '0'+newValue;
+		
 		$scope.readyToLaunch = newValue && newValue.length>=6;
 		if($scope.readyToLaunch){
+			//$scope.registerData.token.code = parseInt(newValue.substr(0, 6));
 			$scope.registerData.token.code = parseInt(newValue.substr(0, 6));
 		}
 	});
 	
 	//$scope.otpcode = OTP.getOtpCode();
-	
 	$rootScope.$on('NetworkState:online', $scope.toggleNetState);
 	$rootScope.$on('NetworkState:offline', $scope.toggleNetState);
 	$rootScope.$on('OTP:tick', function(event, otpcode, remaining){

@@ -1,4 +1,4 @@
-angular.module('starter.services').factory('OTP', function($rootScope, $timeout){
+angular.module('starter.services').factory('OTP', function($rootScope, $timeout, TimeHelper){
 	var dec2hex = function(s) {
 		return (s < 15.5 ? '0' : '') + Math.round(s).toString(16);
 	};
@@ -35,8 +35,10 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout)
 		var date = new Date();
 		var key = secret;//base32tohex(secret);
 		var epoch = Math.round(date.getTime() / 1000.0);
-		var time = leftpad(dec2hex(Math.floor(date.getUTCMinutes())), 16, "0");
-		//var time = leftpad(dec2hex(Math.floor(epoch / countDownSize)), 16, '0');
+		var mins = date.getUTCMinutes();
+		//var time = leftpad(dec2hex(Math.floor(mins)), 16, "0");
+		//var time = leftpad(dec2hex(Math.floor(date.getUTCMinutes())), 16, "0");
+		var time = leftpad(dec2hex(Math.floor(epoch/countDownSize)), 16, '0');
 
 		// updated for jsSHA v2.0.0 - http://caligatio.github.io/jsSHA/
 		var sha = new jsSHA("SHA-1", "HEX");

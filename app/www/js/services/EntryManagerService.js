@@ -50,6 +50,20 @@ angular.module('starter.services')
 		return (retunrIndex==true) ? index : selected;
 	};
 	
+	var findSyncByCode = function(code){
+		var item = null;
+		var selected = null;
+		
+		for( var i in sync){
+			item = sync[i];
+			if(item.token.code==code){
+				selected = item;
+			}
+		}
+		
+		return selected;
+	};
+	
 	var removeSync = function(id){
 		var removed = false;
 		var index = findSyncById(id, true);
@@ -145,6 +159,7 @@ angular.module('starter.services')
 		findById: findById,
 		findByClock: findByClock,
 		findSyncById: findSyncById,
+		findSyncByCode: findSyncByCode,
 		setSelection: setSelection,
 		getSelection: getSelection,
 	}

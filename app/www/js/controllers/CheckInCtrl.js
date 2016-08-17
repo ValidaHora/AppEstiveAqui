@@ -77,6 +77,9 @@ angular.module('starter.controllers')
 		}else if(!$scope.registerData.token.code){
 			$scope.simpleAlert('Erro', 'Código não pode ser vazio');
 		
+		}else if( EntryManager.findSyncByCode(padToken()) ){
+			$scope.simpleAlert('Erro', 'Este código já esta na fila para ser enviado.');
+			
 		}else if( !tokenValidation() ){
 			$scope.displayError('Código inválido. Verifique se o passclock é o correto.', 'Clique no botão abaixo para lançar sua hora.');
 			//$scope.simpleAlert('Erro', 'Código inválido');

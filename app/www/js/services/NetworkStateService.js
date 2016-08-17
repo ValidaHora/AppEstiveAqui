@@ -27,13 +27,13 @@ angular.module('starter.services')
 	var stateChanged = function(event, netState){
 		var type = isOnline() ? 'online' : 'offline';
 		
-		$rootScope.$broadcast('NetworkState:'+type, [event, netState]);	
+		$rootScope.$broadcast('NetworkState:'+type, [event, netState]);
 	};
 	
 	function checkNavigator(){
 		if(!navigator.connection){
-			//navigator.connection = {type: WIFI};
-			navigator.connection = {type: NONE};
+			navigator.connection = {type: WIFI};
+			//navigator.connection = {type: NONE};
 		}
 		
 		/*if($rootScope.isWeb){

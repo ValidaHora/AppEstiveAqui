@@ -137,9 +137,10 @@ angular.module('starter.controllers')
 	}
 	
 	var tokenValidation = function(){
-		var date = new Date();
-		var validToken = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());
 		var token = padToken();
+		/*var date = new Date();
+		var validToken = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());*/
+		var validToken = OTP.getOtpCode();
 		
 		return validToken == token;
 	};
@@ -156,11 +157,13 @@ angular.module('starter.controllers')
 	$scope.isError 		= false;
 	$scope.errorTitle 	= null;
 	$scope.errorMessage = null;
-	$scope.hasNetwork 	= false;
+	$scope.hasNetwork 	= true;
 	$scope.syncCount 	= EntryManager.getSync().length;
 	$scope.history 		= [];
 	$scope.isLoged 		= User.get().id!=undefined;
 	$scope.registerData = {};
+	$scope.otpcode = 'not started';
+	$scope.timer = 0;
 	
 	resetRegister();
 	if(!$scope.isWeb){
@@ -183,6 +186,7 @@ angular.module('starter.controllers')
 		}
 		
 		$scope.clocks = PassClockManager.get();
+		console.log($scope.clocks);
 	});
 	
 	
@@ -195,6 +199,13 @@ angular.module('starter.controllers')
 		}
 	});
 	
+	//$scope.otpcode = OTP.getOtpCode();
+	
 	$rootScope.$on('NetworkState:online', $scope.toggleNetState);
 	$rootScope.$on('NetworkState:offline', $scope.toggleNetState);
+	$rootScope.$on('OTP:tick', function(event, otpcode, remaining){
+		$scope.otpcode = otpcode;
+		$scope.timer = remaining;
+		$scope.$apply();
+	});
 })

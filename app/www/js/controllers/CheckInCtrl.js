@@ -27,16 +27,25 @@ angular.module('starter.controllers')
 		var has = NetworkState.isOnline();//networkState != 'none';//navigator.connection.type.NONE;
 		if(has){
 			$scope.fetch();
+			$scope.runSync();
+		}else{
+			clearTimeout(syncTimeout);
 		}
 		
+		console.log('network state has changed to: '+netState);
 		$scope.hasNetwork = has;
-	}
+	};
+	
+	$scope.toggleNet = function(){
+		$scope.hasNetwork = !$scope.hasNetwork;
+		navigator.connection.type = $scope.hasNetwork ? 'wifi' : 'none';
+	};
 	
 	$scope.displaySuccess = function(){
 		$scope.isShowMain = false;
 		$scope.isSuccess = true;
 		$scope.isError = false;
-	}
+	};
 	
 	$scope.displayError = function(title, message){
 		$scope.isShowMain = false;
@@ -45,20 +54,20 @@ angular.module('starter.controllers')
 		
 		$scope.errorTitle = title;
 		$scope.errorMessage = message;
-	}
+	};
 	
 	$scope.displayMain = function(){
 		$scope.isShowMain = true;
 		$scope.isSuccess = false;
 		$scope.isError = false;
-	}
+	};
 	
 	$scope.fetch = function(){
-		ApiEstiveAqui.fetchUserData().then(function(){
+		ApiEstiveAqui.fetchUserData().request().then(function(){
 			$scope.history = EntryManager.get();
 			$scope.registerData.token.clock = EntryManager.getSelection();
 		});
-	}
+	};
 	
 	$scope.registerToken = function(){
 		//$scope.displaySuccess();
@@ -82,13 +91,12 @@ angular.module('starter.controllers')
 				$scope.registerData.position.coords.longitude = pos.coords.longitude;
 				
 				if($scope.hasNetwork){
-					ApiValidaHora.calcHour($scope.registerData.token.clock, $scope.registerData.token.code, $scope.registerData.typedTime, $scope.registerData.position).then(function(calculated){
+					ApiValidaHora.calcHour($scope.registerData.token.clock, $scope.registerData.token.code, $scope.registerData.typedTime, $scope.registerData.position).request().then(function(calculated){
 						$scope.registerData.launchTime = calculated.HoraLancada;
 						$scope.registerData.hashCode = calculated.HashCode;
 						$scope.displaySuccess();
 					});
 				}else{
-					//EntryManager.schedule($scope.registerData);
 					$ionicLoading.hide();
 					$scope.displaySuccess();
 				}
@@ -97,7 +105,7 @@ angular.module('starter.controllers')
 				$scope.simpleAlert('Não foi possivel obter a sua localização.');
 			});			
 		}
-	}
+	};
 	
 	$scope.launchHour = function(){
 		var title = 'Sucesso';
@@ -112,7 +120,7 @@ angular.module('starter.controllers')
 				$scope.registerData.hashCode,
 				$scope.registerData.position,
 				$scope.registerData.note
-			).then(function(launched){
+			).request().then(function(launched){
 				EntryManager.add(launched.Lancamento);
 				EntryManager.setSelection($scope.registerData.token.clock);
 				$scope.history.push(launched.Lancamento);
@@ -126,15 +134,28 @@ angular.module('starter.controllers')
 			EntryManager.schedule($scope.registerData);
 			$scope.syncCount ++;
 			resetRegister();
-			$scope.simpleAlert(title, msg);
 		}
-	}
+	};
 	
-	$scope.sync = function(){};
+	$scope.runSync = function(){
+		if($scope.syncCount>0){
+			console.log('sync runing');
+			var data = $scope.sync[0];
+			//var removed = EntryManager.removeSync(data._id);
+			//return false;
+			ApiEstiveAqui.syncToken(data.token.clock, data.token.code, data.typedTime, data.position).then(function(r){
+				var removed = EntryManager.removeSync(data._id);
+				$scope.syncCount --;
+				console.log('sync end');
+				console.log('removed', removed);
+				syncTimeout = setTimeout($scope.runSync, $scope.syncDelay);
+			});
+		}
+	};
 	
 	var padToken = function(){
 		return (('000000'+$scope.registerData.token.code).slice(-6));
-	}
+	};
 	
 	var tokenValidation = function(){
 		var token = padToken();
@@ -149,7 +170,8 @@ angular.module('starter.controllers')
 		$scope.registerData = { token:{code: null, clock:selected}, note: null, position:{coords:{latitude:0,longitude:0}}, typedTime:null, launchTime:null, hashCode:null };
 	};
 	
-	var selected = EntryManager.getSelection();
+	var selected 		= EntryManager.getSelection();
+	var syncTimeout		= -1;
 	$scope.clocks 		= [];
 	$scope.readyToLaunch= false;
 	$scope.isShowMain 	= true;
@@ -158,12 +180,16 @@ angular.module('starter.controllers')
 	$scope.errorTitle 	= null;
 	$scope.errorMessage = null;
 	$scope.hasNetwork 	= false;
-	$scope.syncCount 	= EntryManager.getSync().length;
+	$scope.sync 		= EntryManager.getSync();
+	$scope.syncCount 	= $scope.sync.length;
+	$scope.syncDelay 	= 60000;
 	$scope.history 		= [];
 	$scope.isLoged 		= User.get().id!=undefined;
 	$scope.registerData = {};
 	$scope.otpcode = 'not started';
 	$scope.timer = 0;
+	$scope.success = {button:null, title:null, message: null};
+	$scope.fail = {button:null, title:null, message: null};
 	
 	resetRegister();
 	if(!$scope.isWeb){
@@ -186,16 +212,14 @@ angular.module('starter.controllers')
 		}
 		
 		$scope.clocks = PassClockManager.get();
-		console.log($scope.clocks);
+		console.log(EntryManager.getSync());
 	});
 	
 	
 	var isZeroStart = false;
 	$scope.$watch('registerData.token.code', function(newValue, oldValue) {
 		newValue = newValue+'';
-		//oldValue = oldValue+'';
 		if(newValue=='0'){
-			//newValue = '0'+newValue;
 			isZeroStart = true;
 		}else if(newValue=='null'){
 			isZeroStart = false;
@@ -206,12 +230,10 @@ angular.module('starter.controllers')
 		
 		$scope.readyToLaunch = newValue && newValue.length>=6;
 		if($scope.readyToLaunch){
-			//$scope.registerData.token.code = parseInt(newValue.substr(0, 6));
 			$scope.registerData.token.code = parseInt(newValue.substr(0, 6));
 		}
 	});
 	
-	//$scope.otpcode = OTP.getOtpCode();
 	$rootScope.$on('NetworkState:online', $scope.toggleNetState);
 	$rootScope.$on('NetworkState:offline', $scope.toggleNetState);
 	$rootScope.$on('OTP:tick', function(event, otpcode, remaining){

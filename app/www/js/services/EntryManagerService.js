@@ -34,25 +34,63 @@ angular.module('starter.services')
 		return sync;
 	};
 	
+	var findSyncById = function(id, retunrIndex){
+		var item = null;
+		var selected = null;
+		var index = null;
+		
+		for( var i in sync){
+			item = sync[i];
+			if(item._id==id){
+				selected = item;
+				index = i;
+			}
+		}
+		
+		return (retunrIndex==true) ? index : selected;
+	};
+	
+	var removeSync = function(id){
+		var removed = false;
+		var index = findSyncById(id, true);
+		if(index){
+			sync.splice(index, 1);
+			removed = true;
+			save();
+		}
+		
+		return removed;
+	}
+	
 	var schedule = function(data){
 		var index = sync.length-1;
 		var last = sync[index];
 		if(
-			index > -1 && (
+			(index > -1 && data._id) && (
+				last._id==data._id ||
 				last.token.code==data.token.code ||
 				last.typedTime==data.typedTime
 			)
 		){
 			sync[index] = data;
 		}else{
+			data._id = hash();
 			sync.push(data);
 		}
 		
-		
 		save();
+		return data._id;
 	};
 	
-	var reschedule = function(data){};
+	var hash = function(){
+		var date = new Date();
+		var sha = new jsSHA("SHA-1", "TEXT");
+		var hash = null;
+		sha.update(date.getTime().toString()+Math.random());
+		hash = sha.getHash("HEX");
+		
+		return hash;
+	};
 	
 	var find = function(term, field){
 		var clock = null;
@@ -103,9 +141,10 @@ angular.module('starter.services')
 		add: add,
 		getSync: getSync,
 		schedule: schedule,
-		reschedule: reschedule,
+		removeSync: removeSync,
 		findById: findById,
 		findByClock: findByClock,
+		findSyncById: findSyncById,
 		setSelection: setSelection,
 		getSelection: getSelection,
 	}

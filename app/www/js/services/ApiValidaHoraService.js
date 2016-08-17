@@ -2,7 +2,7 @@ angular.module('starter.services')
 
 .factory('ApiValidaHora', function($rootScope, ApiRequest, TimeHelper, User){
 	
-	var calcHour = function(tokenID, code, hdg, position){
+	var calcHour = function(tokenID, code, hdg, position, isSilent){
 		/*
 		HDG – Hora digitada, momento da digitação da hora
 		HEN – Hora enviada, momento do envio da hora
@@ -18,7 +18,7 @@ angular.module('starter.services')
 			HEN: TimeHelper.calcDate(),
 			LATITUDE: position.coords.latitude,
 			LONGITUDE: position.coords.longitude,
-		}).request();
+		});
 	}
 	
     var call = function(endpoint, params){

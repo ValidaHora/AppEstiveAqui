@@ -71,6 +71,7 @@ angular.module('starter.services')
 		var setFile = function(key, filePath){
 			if( filePath )
 				targetFile = {key: key, path:filePath};
+			return this;
 		};
 		
 		var getAllParams = function(){
@@ -79,14 +80,17 @@ angular.module('starter.services')
 				
 		var setGetMethod = function(){
 			method = METHOD_GET;
+			return this;
 		};
 		
 		var isGet = function(){
 			return method == METHOD_GET;
+			return this;
 		};
 		
 		var setPostMethod = function(){
 			method = METHOD_POST;
+			return this;
 		};
 		
 		var isPost = function(){
@@ -95,14 +99,17 @@ angular.module('starter.services')
 		
 		var setAction = function(ac){
 			action = ac;
+			return this;
 		};
 		
 		var setSilent = function(sl){
 			silent = sl;
+			return this;
 		};
 		
 		var enableDebug = function(){
 			debugmode = true;
+			return this;
 		};
 		
 		var isSilent = function(){
@@ -111,10 +118,12 @@ angular.module('starter.services')
 		
 		var enableAutoError = function() {
 			displayError = true;
+			return this;
 		};
 		
 		var disableAutoError = function() {
 			displayError = false;
+			return this;
 		};
 		
 		var isAutoError = function() {
@@ -127,6 +136,7 @@ angular.module('starter.services')
 		
 		var connectionCheck = function(check){
 			connectionCheck = check;
+			return this;
 		};
 		
 		var needConnecttionCheck = function(){

@@ -42,21 +42,17 @@ angular.module('starter.services')
 			NOTA: note,
 		};
 		
-		return call('LancaHora', data).request().then(function(response){
-			
-			
-			return response;
-		});
+		return call('LancaHora', data);
 	};
 	
-	var registerToken = function(tokenID, code, horaDigitada, position){
-		return ApiValidaHora.calcHour(tokenID, code, horaDigitada, position).then(function(response){
-			return launchHour(tokenID, code, horaDigitada, response.HoraLancada, response.HashCode, position);					
+	var syncToken = function(tokenID, code, horaDigitada, position){
+		return ApiValidaHora.calcHour(tokenID, code, horaDigitada, position).setSilent(true).request().then(function(response){
+			return launchHour(tokenID, code, horaDigitada, response.HoraLancada, response.HashCode, position).setSilent(true).request();
 		});
 	}
 	
 	var call = function(endpoint, params){
-		var api = new ApiRequest();
+		api = new ApiRequest();
 		api.isAutoError(true);
 		api.debug(true);
 		api.endpoint($rootScope.EA_BASE_URL+endpoint);
@@ -68,10 +64,11 @@ angular.module('starter.services')
 		return api;
 	};
 	
+	var api;
 	return {
 		register: register,
 		fetchUserData: fetchUserData,
-		registerToken: registerToken,
+		syncToken: syncToken,
 		launchHour: launchHour,
 	};
 });

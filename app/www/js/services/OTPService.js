@@ -57,19 +57,6 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 	    otp = (otp).substr(otp.length - 6, 6);
 	};
 	
-	/*var updateOtp = function(){
-		var date = new Date();
-		var sha = new jsSHA('SHA-1', "HEX");
-	    sha.setHMACKey(secret, "HEX");
-	    sha.update(leftpad(dec2hex(Math.floor(date.getUTCMinutes())), 16, "0"));
-	    var hmac = sha.getHMAC("HEX");
-
-	    var offset = hex2dec(hmac.substring(hmac.length - 1));
-	    var codigo = (hex2dec(hmac.substr(offset * 2, 8)) & hex2dec("7fffffff")) + "";
-	    codigo = (codigo).substr(codigo.length - 6, 6);
-	    otp = codigo;
-	};*/
-	
 	var timer = function(){
 		var epoch = Math.round(new Date().getTime() / 1000.0);
 		var countDown = countDownSize - (epoch % countDownSize);
@@ -79,7 +66,7 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 		if(remaining == 0){
 			updateOtp();
 		}
-		$rootScope.$broadcast('OTP:tick', getOtpCode(), remaining);
+		$rootScope.$broadcast('OTP:tick', getOtpCode(), remaining, countDownSize);
 		
 		//console.log('timer called: '+countDown);
 	};
@@ -87,6 +74,10 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 	var getOtpCode = function(){
 		return otp;
 	};
+	
+	var getCountDownSize = function(){
+		return countDownSize;
+	}
 	
 	var isEquals = function(code){
 		return getOtpCode()==code;
@@ -111,6 +102,7 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 	
 	start();
 	return {
+		getCountDownSize: getCountDownSize,
 		getOtpCode: getOtpCode,
 		isEquals: isEquals,
 		start: start,

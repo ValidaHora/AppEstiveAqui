@@ -1,9 +1,9 @@
 <ion-view view-title="Valida Hora">
 	<ion-nav-buttons side="right">
-		<button class="button button-clear button-positive">
+		<button class="button button-clear button-positive" ng-click="toggleNet()">
 			<img ng-src="img/satelite{{hasNetwork?'On':'Off'}}.png" />
 		</button>
-		<button class="button button-clear button-positive" ng-click="sync()" ng-disabled="syncCount==0||!hasNetwork">
+		<button class="button button-clear button-positive" ng-click="runSync()" ng-disabled="syncCount==0||!hasNetwork">
 			<img src="img/syncHora.png" />
 			<span class="badge badge-assertive" ng-if="syncCount>0">{{syncCount}}</span>
 		</button>

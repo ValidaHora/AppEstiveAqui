@@ -169,9 +169,33 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	};
 	
 	var validateOTP = function(token){
-		var validToken = OTP.getOtpCode();
+		var passes = false;
+		var past = 20;
+		var future = 20;
+		var date = new Date();
+		var currentTest = OTP.getOtpCodeFromDate(date);
+		var dateTest;
+		var otp;
+		if(currentTest==token){
+			passes = true;
+		}else{
+			date.setMinutes(date.getUTCMinutes()-past);
+			
+			for(var i=0; i<(past+future); i++){
+				otp = OTP.getOtpCodeFromDate(date);
+				passes = token==otp;
+				
+				/*console.log(token+" == "+otp, passes);
+				console.log(date);
+				console.log(i+' | -----------------------------------------------------'+(passes?'-------------------->':''));*/
+				if(passes){
+					break;
+				}
+				date.setMinutes(date.getUTCMinutes()+1);
+			}
+		}
 		
-		return validToken == token;
+		return passes;
 	}
 	
 	var validateTest = function(token){
@@ -210,8 +234,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	resetRegister();
 	if(!$scope.isWeb){
 		$scope.hasNetwork = NetworkState.isOnline();
-		if($scope.hasNetwork && $scope.isLoged)
-			$scope.fetch();
+		/*if($scope.hasNetwork && $scope.isLoged)
+			$scope.fetch();*/
 	}else{
 		$scope.hasNetwork = true;
 	}

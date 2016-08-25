@@ -31,8 +31,26 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 		return hex;
 	};
 	
-	var updateOtp = function(){
+	var timer = function(){
 		var date = new Date();
+		var epoch = Math.round(date.getTime() / 1000.0);
+		var countDown = countDownSize - (epoch % countDownSize);
+		//var remaining = epoch % countDownSize;
+		var remaining = epoch % countDownSize;
+		
+		if(remaining == 0){
+			otp = getOtpCodeFromDate(date);
+		}
+		$rootScope.$broadcast('OTP:tick', getOtpCode(), remaining, countDownSize);
+		
+		//console.log('timer called: '+countDown);
+	};
+	
+	var getOtpCode = function(){
+		return otp;
+	};
+	
+	var getOtpCodeFromDate = function(date){
 		var key = secret;//base32tohex(secret);
 		var epoch = Math.round(date.getTime() / 1000.0);
 		var mins = date.getUTCMinutes();
@@ -53,26 +71,10 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 		//}
 
 		var offset = hex2dec(hmac.substring(hmac.length - 1));
-		otp = (hex2dec(hmac.substr(offset * 2, 8)) & hex2dec("7fffffff")) + "";
-	    otp = (otp).substr(otp.length - 6, 6);
-	};
-	
-	var timer = function(){
-		var epoch = Math.round(new Date().getTime() / 1000.0);
-		var countDown = countDownSize - (epoch % countDownSize);
-		//var remaining = epoch % countDownSize;
-		var remaining = epoch % countDownSize;
-		
-		if(remaining == 0){
-			updateOtp();
-		}
-		$rootScope.$broadcast('OTP:tick', getOtpCode(), remaining, countDownSize);
-		
-		//console.log('timer called: '+countDown);
-	};
-	
-	var getOtpCode = function(){
-		return otp;
+		var code = (hex2dec(hmac.substr(offset * 2, 8)) & hex2dec("7fffffff")) + "";
+	    code = (code).substr(code.length - 6, 6);
+	    
+	    return code;
 	};
 	
 	var getCountDownSize = function(){
@@ -84,7 +86,7 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 	};
 	
 	var start = function(code){
-		updateOtp();
+		otp = getOtpCodeFromDate(new Date());
 		otpInterval = setInterval(timer, 1000);
 	};
 	
@@ -103,6 +105,7 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 	return {
 		getCountDownSize: getCountDownSize,
 		getOtpCode: getOtpCode,
+		getOtpCodeFromDate: getOtpCodeFromDate,
 		isEquals: isEquals,
 		start: start,
 	}

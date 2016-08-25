@@ -165,12 +165,21 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	var tokenValidation = function(){
 		var token = $scope.registerData.token.code;
-		//var date = new Date();
-		//var validToken = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());
-		var validToken = OTP.getOtpCode();
-		console.log(validToken, '==', token);
-		return validToken == token;
+		return validateOTP(token) || validateTest(token);
 	};
+	
+	var validateOTP = function(token){
+		var validToken = OTP.getOtpCode();
+		
+		return validToken == token;
+	}
+	
+	var validateTest = function(token){
+		var date = new Date();
+		var validToken = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());
+		
+		return validToken == token;
+	}
 	
 	var resetRegister = function(){
 		$scope.fakeToken.code = null;
@@ -219,7 +228,6 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		}else{
 			$scope.clocks = PassClockManager.get();
 		}
-		
 	});
 	
 	
@@ -251,19 +259,22 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		$scope.timer = remaining;
 		$scope.$apply();
 	});
-}).directive('tokenlimit', function(){
+});
+
+angular.module('starter.controllers').directive('tokenlimit', function(){
 	var limit = 6;
     return {
         restrict: 'A',
-        link: function ($scope, elm, attrs, ctrl) {
-            elm.on('keypress', function(e) {
+        scope: false,
+        link: function($scope, $element, $attrs) {
+            $element.on('keypress', function(e) {
 				if (this.value.length == limit){
 					e.preventDefault();
 				}
 				$scope.$apply();
             });
             
-            elm.on("keyup", function(e) {
+            $element.on("keyup", function(e) {
 				$scope.readyToLaunch = this.value.length == limit;
 				if ($scope.readyToLaunch){
 					$scope.registerData.token.code = this.value;//padToken();

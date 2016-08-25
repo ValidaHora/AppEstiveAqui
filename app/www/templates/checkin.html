@@ -1,9 +1,9 @@
 <ion-view view-title="Valida Hora">
 	<ion-nav-buttons side="right">
-		<button class="button button-clear button-positive" ng-click="toggleNet()">
+		<button class="button button-clear button-positive" ng-click="toggleNetRM()">
 			<img ng-src="img/satelite{{hasNetwork?'On':'Off'}}.png" />
 		</button>
-		<button class="button button-clear button-positive" ng-click="runSync()" ng-disabled="syncCount==0||!hasNetwork">
+		<button class="button button-clear button-positive" ng-disabled="syncCount==0||!hasNetwork">
 			<img src="img/syncHora.png" />
 			<span class="badge badge-assertive" ng-if="syncCount>0">{{syncCount}}</span>
 		</button>
@@ -26,7 +26,7 @@
 			<div class="row">
 				<div class="col col-80 col-offset-10 inserir-codigo">
 					<img src="img/relogio.png" />
-					<input type="number" name="token" placeholder="Inserir código" ng-model="registerData.token.code" id="code" autofocus="true" />
+					<input type="number" pattern="[0-9]" name="token" placeholder="Inserir código" ng-model="fakeToken.code" tokenlimit id="code" autofocus="true" />
 				</div>
 			</div>
 			<div class="row">

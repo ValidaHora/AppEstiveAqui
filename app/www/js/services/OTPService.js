@@ -86,7 +86,6 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 	var start = function(code){
 		updateOtp();
 		otpInterval = setInterval(timer, 1000);
-		console.log('otp started');
 	};
 	
 	var stop = function(code){

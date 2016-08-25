@@ -27,7 +27,7 @@ angular.module('starter.services')
 	var stateChanged = function(event, netState){
 		var type = isOnline() ? 'online' : 'offline';
 		
-		$rootScope.$broadcast('NetworkState:'+type, [event, netState]);
+		$rootScope.$broadcast('NetworkState:'+type, event, netState);
 	};
 	
 	function checkNavigator(){
@@ -40,7 +40,7 @@ angular.module('starter.services')
 			navigator.connection = {type:WIFI};
 		}*/
 	}
-	checkNavigator();
+	//checkNavigator();
 	
 	$rootScope.$on('$cordovaNetwork:online', stateChanged);
 	$rootScope.$on('$cordovaNetwork:offline', stateChanged);

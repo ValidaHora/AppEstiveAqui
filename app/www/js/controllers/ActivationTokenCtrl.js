@@ -11,7 +11,7 @@ angular.module('starter.controllers')
 	}
 	
 	$scope.activate = function(){
-		ApiEstiveAqui.register($scope.token.number).request().then(function(){
+		ApiEstiveAqui.register($scope.token.number).then(function(){
 			$ionicHistory.nextViewOptions({
 				disableAnimate: false,
 				disableBack: true,

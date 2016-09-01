@@ -63,9 +63,11 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	};
 	
 	$scope.fetch = function(){
-		ApiEstiveAqui.fetchUserData().then(function(){
-			$scope.history = EntryManager.get();
-		});
+		if($scope.isLoged){
+			ApiEstiveAqui.fetchUserData().then(function(){
+				$scope.history = EntryManager.get();
+			});
+		}
 	};
 	
 	$scope.registerToken = function(){
@@ -234,8 +236,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	resetRegister();
 	if(!$scope.isWeb){
 		$scope.hasNetwork = NetworkState.isOnline();
-		/*if($scope.hasNetwork && $scope.isLoged)
-			$scope.fetch();*/
+		if($scope.hasNetwork && $scope.isLoged)
+			$scope.fetch();
 	}else{
 		$scope.hasNetwork = true;
 	}

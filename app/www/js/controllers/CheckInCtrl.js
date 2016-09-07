@@ -1,4 +1,4 @@
-angular.module('starter.controllers').controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate, $ionicHistory, $state, $ionicLoading, $cordovaGeolocation, NetworkState, OTP, EntryManager, PassClockManager, ApiValidaHora, ApiEstiveAqui, TimeHelper, User){
+angular.module('starter.controllers').controller('CheckInCtrl', function($rootScope, $scope, $ionicModal, $cordovaNetwork, $ionicSideMenuDelegate, $ionicHistory, $state, $timeout, $ionicLoading, $cordovaGeolocation, NetworkState, OTP, EntryManager, PassClockManager, ApiValidaHora, ApiEstiveAqui, TimeHelper, User){
 	/*$scope.toggleLeft = function(){
 		$ionicSideMenuDelegate.toggleLeft();
 	};*/
@@ -23,15 +23,13 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	});
 		
 	$scope.toggleNetState = function(event, netState){
-		var has = NetworkState.isOnline(); //networkState != 'none';//navigator.connection.type.NONE;
+		var has = NetworkState.isOnline();
 		if(has){
 			$scope.fetch();
 			$scope.runSync();
 		}else{
 			clearTimeout(syncTimeout);
 		}
-		
-		console.log('network state has changed to: ', netState);
 		$scope.hasNetwork = has;
 	};
 	
@@ -71,12 +69,10 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	};
 	
 	$scope.registerToken = function(){
-		//$scope.displaySuccess();
 		if(!$scope.registerData.token.clock){
 			$scope.simpleAlert('Erro', 'Selecione o local');
 		
 		}else if(!$scope.registerData.token.code){
-			console.log('token.code', $scope.registerData.token.code);
 			$scope.simpleAlert('Erro', 'Código não pode ser vazio');
 		
 		}else if( EntryManager.findSyncByCode($scope.registerData.token.code) ){
@@ -84,14 +80,11 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 			
 		}else if( !tokenValidation() ){
 			$scope.displayError('Tentar novamente', 'Código inválido. Verifique se o passclock é o correto.', '');
-			//$scope.simpleAlert('Erro', 'Código inválido');
 			
 		}else{
 			$scope.registerData.typedTime = TimeHelper.calcDate();
-			//$scope.registerData.token.code = padToken();
-			
 			$ionicLoading.show();
-			$cordovaGeolocation.getCurrentPosition({enableHighAccuracy:false}).then(function(pos){
+			$cordovaGeolocation.getCurrentPosition({timeout:15, enableHighAccuracy:false}).then(function(pos){
 				$scope.registerData.position.coords.latitude = pos.coords.latitude;
 				$scope.registerData.position.coords.longitude = pos.coords.longitude;
 				
@@ -107,8 +100,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				}
 			}, function(){
 				$ionicLoading.hide();
-				$scope.simpleAlert('Não foi possivel obter a sua localização.');
-			});			
+				$scope.simpleAlert('Erro', 'Não foi possivel obter a sua localização.');
+			});
 		}
 	};
 	

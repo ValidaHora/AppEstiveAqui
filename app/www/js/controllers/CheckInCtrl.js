@@ -84,26 +84,49 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		}else{
 			$scope.registerData.typedTime = TimeHelper.calcDate();
 			$ionicLoading.show();
-			$cordovaGeolocation.getCurrentPosition({timeout:15, enableHighAccuracy:false}).then(function(pos){
-				$scope.registerData.position.coords.latitude = pos.coords.latitude;
-				$scope.registerData.position.coords.longitude = pos.coords.longitude;
-				
-				if($scope.hasNetwork){
-					ApiValidaHora.calcHour($scope.registerData.token.clock, $scope.registerData.token.code, $scope.registerData.typedTime, $scope.registerData.position).request().then(function(calculated){
-						$scope.registerData.launchTime = calculated.HoraLancada;
-						$scope.registerData.hashCode = calculated.HashCode;
-						$scope.displaySuccess();
-					});
-				}else{
-					$ionicLoading.hide();
-					$scope.displaySuccess();
-				}
-			}, function(){
-				$ionicLoading.hide();
-				$scope.simpleAlert('Erro', 'Não foi possivel obter a sua localização.');
-			});
+			
+			function hasLocationCallback(available){
+				$cordovaGeolocation.getCurrentPosition({timeout:15000, enableHighAccuracy:false}).then(function(pos){
+					$scope.registerData.position.coords.latitude = pos.coords.latitude;
+					$scope.registerData.position.coords.longitude = pos.coords.longitude;
+					$scope.calcHour();
+					
+				}, function(err){
+					console.log('get possition error', err);
+					var posError;
+					if(err.code==3)
+						posError = 3000;
+					else
+						posError = 4000;
+					
+					$scope.registerData.position.coords.latitude = posError;
+					$scope.registerData.position.coords.longitude = posError;
+					$scope.calcHour();
+				});
+			}
+			
+			function noLocationCallback(error){
+				$scope.registerData.position.coords.latitude = 2000;
+				$scope.registerData.position.coords.longitude = 2000;
+				$scope.calcHour();
+			}
+			cordova.plugins.diagnostic.isLocationAvailable(hasLocationCallback, noLocationCallback);
 		}
 	};
+	
+	$scope.calcHour = function(){
+		if($scope.hasNetwork){
+			ApiValidaHora.calcHour($scope.registerData.token.clock, $scope.registerData.token.code, $scope.registerData.typedTime, $scope.registerData.position).request().then(function(calculated){
+				$scope.registerData.launchTime = calculated.HoraLancada;
+				$scope.registerData.hashCode = calculated.HashCode;
+				$scope.displaySuccess();
+				//$ionicLoading.hide();
+			});
+		}else{
+			$ionicLoading.hide();
+			$scope.displaySuccess();
+		}
+	}
 	
 	$scope.launchHour = function(){
 		var title = 'Sucesso';

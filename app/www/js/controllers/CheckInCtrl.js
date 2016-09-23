@@ -86,30 +86,38 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 			$ionicLoading.show();
 			
 			function hasLocationCallback(available){
-				$cordovaGeolocation.getCurrentPosition({timeout:15000, enableHighAccuracy:false}).then(function(pos){
-					$scope.registerData.position.coords.latitude = pos.coords.latitude;
-					$scope.registerData.position.coords.longitude = pos.coords.longitude;
+				
+				if(available){
+					$cordovaGeolocation.getCurrentPosition({timeout:3000, enableHighAccuracy:false}).then(function(pos){
+						$scope.registerData.position.coords.latitude = pos.coords.latitude;
+						$scope.registerData.position.coords.longitude = pos.coords.longitude;
+						$scope.calcHour();
+						
+					}, function(err){
+						console.log('get possition error', err);
+						var posError;
+						if(err.code==3)
+							posError = 3000;
+						else
+							posError = 4000;
+						
+						$scope.registerData.position.coords.latitude = posError;
+						$scope.registerData.position.coords.longitude = posError;
+						$scope.calcHour();
+					});
+				}else{
+					$scope.registerData.position.coords.latitude = 2000;
+					$scope.registerData.position.coords.longitude = 2000;
 					$scope.calcHour();
-					
-				}, function(err){
-					console.log('get possition error', err);
-					var posError;
-					if(err.code==3)
-						posError = 3000;
-					else
-						posError = 4000;
-					
-					$scope.registerData.position.coords.latitude = posError;
-					$scope.registerData.position.coords.longitude = posError;
-					$scope.calcHour();
-				});
+				}
 			}
 			
 			function noLocationCallback(error){
-				$scope.registerData.position.coords.latitude = 2000;
-				$scope.registerData.position.coords.longitude = 2000;
+				$scope.registerData.position.coords.latitude = 1000;
+				$scope.registerData.position.coords.longitude = 1000;
 				$scope.calcHour();
 			}
+			
 			cordova.plugins.diagnostic.isLocationAvailable(hasLocationCallback, noLocationCallback);
 		}
 	};

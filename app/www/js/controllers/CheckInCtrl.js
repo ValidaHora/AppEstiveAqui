@@ -238,7 +238,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	var selected 		= EntryManager.getSelection();
 	var syncTimeout		= -1;
-	$scope.clocks 		= [];
+	$scope.clocks 		= PassClockManager.get();
 	$scope.readyToLaunch= false;
 	$scope.isShowMain 	= true;
 	$scope.isSuccess 	= false;
@@ -266,7 +266,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		$scope.hasNetwork = true;
 	}
 	
-	$scope.$on("$ionicView.beforeEnter", function(event, data){
+	/*$scope.$on("$ionicView.beforeEnter", function(event, data){
 		$scope.isLoged = User.get().id!=undefined;
 		if(!$scope.isLoged){
 			$ionicHistory.nextViewOptions({
@@ -278,7 +278,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		}else{
 			$scope.clocks = PassClockManager.get();
 		}
-	});
+	});*/
 	
 	
 	/*var isZeroStart = false;

@@ -3,21 +3,28 @@ angular.module('starter.controllers')
 	$scope.token = {number:null};
 	$scope.lockCode = false;//true;
 	
+	$scope.activate = function(){
+		ApiEstiveAqui.register($scope.token.number).then(
+			function(){
+				$ionicHistory.nextViewOptions({
+					disableAnimate: false,
+					disableBack: true,
+					historyRoot: true,
+				});
+				$state.go('checkin');
+			},
+			function(){
+				$scope.lockCode = false;
+			}
+		);
+	}
+	
 	if($stateParams.code){
-		$scope.token.number = $stateParams.code;		
+		$scope.token.number = $stateParams.code;
+		$scope.lockCode = true;
+		$scope.activate();
 	}else{
 		$scope.lockCode = false;
 		//$scope.simpleAlert('Erro', 'Nenhum código de ativação informado');
-	}
-	
-	$scope.activate = function(){
-		ApiEstiveAqui.register($scope.token.number).then(function(){
-			$ionicHistory.nextViewOptions({
-				disableAnimate: false,
-				disableBack: true,
-				historyRoot: true,
-			});
-			$state.go('checkin');
-		});
 	}
 })

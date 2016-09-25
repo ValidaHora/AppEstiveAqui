@@ -226,9 +226,27 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	var validateTest = function(token){
 		var date = new Date();
-		var validToken = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());
+		var passes = false;
+		var past = 20;
+		var future = 20;
+		var currentTest = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());
 		
-		return validToken == token;
+		if(currentTest==token){
+			passes = true;
+		}else{
+			date.setMinutes(date.getUTCMinutes()-past);
+			for(var i=0; i<(past+future); i++){
+				currentTest = TimeHelper.pad(date.getUTCDate())+TimeHelper.pad(date.getUTCHours())+TimeHelper.pad(date.getUTCMinutes());
+				passes = token==currentTest;
+				
+				if(passes){
+					break;
+				}
+				date.setMinutes(date.getUTCMinutes()+1);
+			}
+		}
+		
+		return passes;
 	}
 	
 	var resetRegister = function(){
@@ -266,7 +284,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		$scope.hasNetwork = true;
 	}
 	
-	/*$scope.$on("$ionicView.beforeEnter", function(event, data){
+	$scope.$on("$ionicView.beforeEnter", function(event, data){
 		$scope.isLoged = User.get().id!=undefined;
 		if(!$scope.isLoged){
 			$ionicHistory.nextViewOptions({
@@ -278,7 +296,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		}else{
 			$scope.clocks = PassClockManager.get();
 		}
-	});*/
+	});
 	
 	
 	/*var isZeroStart = false;

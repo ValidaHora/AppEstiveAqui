@@ -3,6 +3,7 @@ angular.module('starter.services')
 .factory('ApiEstiveAqui', function($rootScope, ApiRequest, LocalStorage, PassClockManager, EntryManager, ApiValidaHora, User, TimeHelper){
 	var register = function(code){
 		return call('CadastraAppUsuario', {CODATIVACAO: code}).request().then(function(response){
+			//var id = response.IdentificadorAppUsuario;
 			var id = response.IdentificadorAppUsuario;
 			var nick = response.Apelido;
 			if( id && nick ){

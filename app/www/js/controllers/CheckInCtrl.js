@@ -118,7 +118,11 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				$scope.calcHour();
 			}
 			
-			cordova.plugins.diagnostic.isLocationAvailable(hasLocationCallback, noLocationCallback);
+			if(typeof cordova!='undefined'){
+				cordova.plugins.diagnostic.isLocationAvailable(hasLocationCallback, noLocationCallback);
+			}else{
+				hasLocationCallback(true);
+			}
 		}
 	};
 	

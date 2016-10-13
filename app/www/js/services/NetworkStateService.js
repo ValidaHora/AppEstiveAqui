@@ -13,15 +13,15 @@ angular.module('starter.services')
 	
 	
 	var isOnline = function(){
-		return navigator.connection.type!=NONE;
+		return !connection ? true : navigator.connection.type!=NONE;
 	};
 	
 	var isOffline = function(){
-		return navigator.connection.type==NONE;
+		return !connection ? false : navigator.connection.type==NONE;
 	};
 	
 	var isWifi = function(){
-		return navigator.connection.type==WIFI;
+		return !connection ? true : navigator.connection.type==WIFI;
 	};
 	
 	var stateChanged = function(event, netState){

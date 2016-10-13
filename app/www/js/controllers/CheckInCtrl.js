@@ -155,6 +155,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				EntryManager.setSelection($scope.registerData.token.clock);
 				selected = $scope.registerData.token.clock;
 				
+				$scope.history = EntryManager.get();
 				$scope.displayMain();
 				$scope.simpleAlert(title, msg);
 				resetRegister();

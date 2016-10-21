@@ -89,11 +89,24 @@ angular.module('starter.services')
 			sync[index] = data;
 		}else{
 			data._id = hash();
+			add(convertFromRegisterData(data));
+			
 			sync.push(data);
 		}
 		
 		save();
 		return data._id;
+	};
+	
+	var convertFromRegisterData = function(data){
+		return {
+			_id: data._id,
+			not_launched: true,
+			HL: '',
+			PA: data.token.clock,
+			CD: data.token.code,
+			
+		};
 	};
 	
 	var hash = function(){

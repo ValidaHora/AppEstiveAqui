@@ -17,12 +17,21 @@ angular.module('starter.services')
 	};
 	
 	var fetchUserData = function(){
-		return call('LeAppUsuario', {IDAPP: User.getId()}).request().then(function(response){
-			PassClockManager.set(response.PassClocks);
-			EntryManager.set(response.Lancamentos);
-			
-			return response;
-		});
+		return call('LeAppUsuario', {IDAPP: User.getId()}).request().then(
+			function(response){
+				PassClockManager.set(response.PassClocks);
+				EntryManager.set(response.Lancamentos);
+				
+				return response;
+			},
+			function(error){
+				for( var i in error.Mensagens ){
+					if( error.Mensagens[i].Codigo==101 ){
+						User.clear();
+					}
+				}
+			}
+		);
 	};
 	
 	var launchHour = function(tokenID, code, horaDigitada, horaLancada, hashCode, position, note){
@@ -46,10 +55,18 @@ angular.module('starter.services')
 		return call('LancaHora', data);
 	};
 	
-	var syncToken = function(tokenID, code, horaDigitada, position){
-		return ApiValidaHora.calcHour(tokenID, code, horaDigitada, position).setSilent(true).request().then(function(response){
-			return launchHour(tokenID, code, horaDigitada, response.HoraLancada, response.HashCode, position).setSilent(true).request();
-		});
+	var syncToken = function(tokenID, code, horaDigitada, position, data){
+		return ApiValidaHora.calcHour(tokenID, code, horaDigitada, position).setSilent(true).disableAutoError().request().then(
+			function(response){
+				return launchHour(tokenID, code, horaDigitada, response.HoraLancada, response.HashCode, position).setSilent(true).request();
+			},
+			
+			function(err){
+				if(err.ValidadoOk==false && err.Mensagens[0].Codigo==102){
+					return launchHour(tokenID, code, horaDigitada, data.launchTime, data.hashCode, position).setSilent(true).request();
+				}
+			}
+		);
 	}
 	
 	var call = function(endpoint, params){

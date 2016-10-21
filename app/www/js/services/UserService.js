@@ -21,6 +21,10 @@ angular.module('starter.services')
 		return user.nickname;
 	};
 	
+	var clear = function(){
+		LocalStorage.clear();
+	}
+	
 	if(LocalStorage.has(KEY_USER)){
 		user = LocalStorage.getObject(KEY_USER);
 	};
@@ -30,5 +34,6 @@ angular.module('starter.services')
 		get: get,
 		getId: getId,
 		getNickname: getNickname,
+		clear: clear,
 	}
 });

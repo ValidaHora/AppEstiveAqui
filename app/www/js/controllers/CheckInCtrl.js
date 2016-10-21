@@ -144,6 +144,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		var title = 'Sucesso';
 		var msg = 'Hora lançada com sucesso!';
 		
+		EntryManager.setSelection($scope.registerData.token.clock);
 		if($scope.hasNetwork){
 			ApiEstiveAqui.launchHour(
 				$scope.registerData.token.clock,
@@ -153,17 +154,23 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				$scope.registerData.hashCode,
 				$scope.registerData.position,
 				$scope.registerData.note
-			).request().then(function(launched){
-				//$scope.history.push(launched.Lancamento);
-				EntryManager.add(launched.Lancamento);
-				EntryManager.setSelection($scope.registerData.token.clock);
-				selected = $scope.registerData.token.clock;
-				
-				$scope.history = EntryManager.get();
-				$scope.displayMain();
-				$scope.simpleAlert(title, msg);
-				resetRegister();
-			});
+			).disableAutoError().request().then(
+				function(launched){
+					//$scope.history.push(launched.Lancamento);
+					EntryManager.add(launched.Lancamento);
+					
+					selected = $scope.registerData.token.clock;
+					
+					$scope.history = EntryManager.get();
+					$scope.displayMain();
+					$scope.simpleAlert(title, msg);
+					resetRegister();
+				},
+				function(err){
+					$scope.displayError('Tentar novamente', 'Não foi possivel lançar a hora', err.Mensagens[0].Mensagem);
+					resetRegister();
+				}
+			);
 		}else{
 			$scope.displayError('Ok, entendi', 'Você não possui uma conexão com a internet.', 'Sua hora foi salva e sera lançada quando você estiver conectado.');
 			EntryManager.schedule($scope.registerData);
@@ -177,11 +184,13 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 			var data = $scope.sync[0];
 			//var removed = EntryManager.removeSync(data._id);
 			//return false;
-			ApiEstiveAqui.syncToken(data.token.clock, data.token.code, data.typedTime, data.position).then(function(launched){
+			ApiEstiveAqui.syncToken(data.token.clock, data.token.code, data.typedTime, data.position, data).then(function(launched){
 				var removed = EntryManager.removeSync(data._id);
 				$scope.syncCount --;
 				EntryManager.add(launched.Lancamento);
 				syncTimeout = setTimeout($scope.runSync, $scope.syncDelay);
+				
+				$scope.history = EntryManager.get();
 			});
 		}
 	};
@@ -300,6 +309,9 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 			$state.go('activation');
 		}else{
 			$scope.clocks = PassClockManager.get();
+			if($scope.clocks.length==1){
+				$scope.registerData.token.clock = $scope.clocks[0].NumeroPassClock;
+			}
 		}
 	});
 	

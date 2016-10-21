@@ -3,7 +3,7 @@
 		<button class="button button-clear button-positive" ng-click="toggleNetRM()">
 			<img ng-src="img/satelite{{hasNetwork?'On':'Off'}}.png" />
 		</button>
-		<button class="button button-clear button-positive" ng-disabled="syncCount==0||!hasNetwork">
+		<button class="button button-clear button-positive" ng-disabled="syncCount==0||!hasNetwork" ng-click="runSync()">
 			<img src="img/syncHora.png" />
 			<span class="badge badge-assertive" ng-if="syncCount>0">{{syncCount}}</span>
 		</button>
@@ -17,7 +17,9 @@
 					<div class="input-label">
 						Lançando hora em
 					</div>
-					<select ng-model="registerData.token.clock" ng-options="clock.NumeroPassClock as clock.Apelido for clock in clocks"></select>
+					<select ng-model="registerData.token.clock">
+						<option value="{{clock.NumeroPassClock}}" {{registerData.token.clock==clock.NumeroPassClock:'selected':''}} ng-repeat="clock in clocks" ng-if="clock.Status=='0'">{{clock.Apelido}}</option>
+					</select>
 				</label>
 			</div>
 

@@ -25,8 +25,18 @@ angular.module('starter.services')
 			var errors = [];
 			var curErrors;
 			if(serverResponse.ValidadoOk==false && serverResponse.Mensagens){
+				var msg;
+				var err
 				for( var i in serverResponse.Mensagens ){
-					errors.push(serverResponse.Mensagens[i].Descricao);
+					msg = serverResponse.Mensagens[i];
+					if(msg.Descricao){
+						errors.push(msg.Descricao);
+					}else if(msg.Mensagem){
+						//LancaHora, CadastraAppUsuario
+						errors.push(msg.Mensagem);
+					}else{
+						errors.push('Impossivel determinar a descrição do erro');
+					}
 				}
 			}
 			
@@ -251,6 +261,7 @@ angular.module('starter.services')
 					headers: header,
 					data: paramsSend,
 					transformResponse: transformResponse,
+					timeout: 45000,
 				}).then(successCallback, failCallback);
 			
 			return deferred.promise;
@@ -286,6 +297,16 @@ angular.module('starter.services')
 		};
 		
 		var failCallback = function(response){
+			if( response.status>=500 || response.status==-1 ){
+				hideLoader();
+				$ionicPopup.alert({
+					title: '<i class="icon ion-ios-information-outline"></i> Erro',
+					template: 'Não houve resposta do servidor',
+				});
+				
+				return false;
+			}
+			
 			if( response.body ){
 				response.data = transformResponse(response.body);
 			}
@@ -302,7 +323,7 @@ angular.module('starter.services')
 				displayFatalError(response);
 			}
 			
-			deferred.reject(response);
+			deferred.reject(serverResponse);
 		};
 		
 		var extractResponse = function(resp){

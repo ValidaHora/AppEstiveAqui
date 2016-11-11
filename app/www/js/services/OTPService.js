@@ -51,6 +51,9 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 	};
 	
 	var getOtpCodeFromDate = function(date){
+		if(!secret)
+			return null;
+		
 		var key = secret;//base32tohex(secret);
 		var epoch = Math.round(date.getTime() / 1000.0);
 		var mins = date.getUTCMinutes();
@@ -85,9 +88,15 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 		return getOtpCode()==code;
 	};
 	
+	var setSecret = function(sec){
+		secret = sec;
+	};
+	
 	var start = function(code){
-		otp = getOtpCodeFromDate(new Date());
-		otpInterval = setInterval(timer, 1000);
+		if(secret){
+			otp = getOtpCodeFromDate(new Date());
+			otpInterval = setInterval(timer, 1000);
+		}
 	};
 	
 	var stop = function(code){
@@ -96,7 +105,8 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 		}
 	};
 	
-	var secret = 'BBC123ABC123ABC3ABC123ABC123ABC3ABC123ABC123ABC3ABC123ABC123ABC3';
+	//var secret = 'BBC123ABC123ABC3ABC123ABC123ABC3ABC123ABC123ABC3ABC123ABC123ABC3';
+	var secret = null;
 	var otp = null;
 	var otpInterval = null;
 	var countDownSize = 60;
@@ -107,6 +117,8 @@ angular.module('starter.services').factory('OTP', function($rootScope, $timeout,
 		getOtpCode: getOtpCode,
 		getOtpCodeFromDate: getOtpCodeFromDate,
 		isEquals: isEquals,
+		setSecret: setSecret,
 		start: start,
+		stop: stop,
 	}
 })

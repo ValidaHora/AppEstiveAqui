@@ -52,22 +52,51 @@ angular.module('starter.services')
 			NOTA: note,
 		};
 		
-		return call('LancaHora', data);
+		return call('AppUsuario/LancaHora', data);
 	};
 	
-	var syncToken = function(tokenID, code, horaDigitada, position, data){
-		return ApiValidaHora.calcHour(tokenID, code, horaDigitada, position).setSilent(true).disableAutoError().request().then(
-			function(response){
-				return launchHour(tokenID, code, horaDigitada, response.HoraLancada, response.HashCode, position).setSilent(true).request();
-			},
+	var launchHourBatch = function(launches){
+		var batch = [];
+		var sendTime = TimeHelper.calcDate();
+		var syncs = EntryManager.getSync();
+		var toCalc, item, sync;
+		for(var i=0 in launches){
+			item = launches[i];
 			
-			function(err){
-				if(err.ValidadoOk==false && err.Mensagens[0].Codigo==102){
-					return launchHour(tokenID, code, horaDigitada, data.launchTime, data.hashCode, position).setSilent(true).request();
+			if(item && (item.OK==true  || item.Erro.CE==102)){
+				sync = EntryManager.findSyncById(item.IL);
+				
+				if(sync){
+					
+					toCalc = {
+						IL: sync._id,
+						PC: sync.token.clock,
+						CD: sync.token.code,
+						HL: sync.sendTime,
+						NT: sync.note ? sync.note : "empty",
+						HC: sync.hashCode,
+						HD: sync.typedTime.substr(0, sync.typedTime.length-2),
+						LA: sync.position.coords.latitude,
+						LO: sync.position.coords.longitude,
+					}
+					
+					batch.push(toCalc);
 				}
+			}else{
+				console.log('Sync ID['+item.IL+'] not found');
 			}
-		);
-	}
+		}
+		
+		console.log('LANCA_HORAS', batch);
+		var data = {
+			IDAPP: User.getId(),
+			IDDISPOSITIVO: 'Teste',			
+			HREN: sendTime,
+			LANCS: JSON.stringify(batch),
+		};
+		
+		return call('AppUsuario/LancaHoras', data);
+	};
 	
 	var call = function(endpoint, params){
 		api = new ApiRequest();
@@ -76,6 +105,7 @@ angular.module('starter.services')
 		api.endpoint($rootScope.EA_BASE_URL+endpoint);
 		api.addParam('V', '1.0.0');
 		api.addParam('TZ', TimeHelper.timezone);
+		
 		for( var key in params){
 			api.addParam(key, params[key]);
 		}
@@ -86,7 +116,7 @@ angular.module('starter.services')
 	return {
 		register: register,
 		fetchUserData: fetchUserData,
-		syncToken: syncToken,
 		launchHour: launchHour,
+		launchHourBatch: launchHourBatch,
 	};
 });

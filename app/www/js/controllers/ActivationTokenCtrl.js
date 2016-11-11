@@ -1,6 +1,6 @@
 angular.module('starter.controllers')
 .controller('ActivationTokenCtrl', function($scope, $state, $stateParams, $ionicHistory, ApiEstiveAqui){
-	$scope.token = {number:null};
+	$scope.token = {number:'CodNibles01'};
 	$scope.lockCode = false;//true;
 	
 	$scope.activate = function(){
@@ -11,7 +11,9 @@ angular.module('starter.controllers')
 					disableBack: true,
 					historyRoot: true,
 				});
-				$state.go('checkin');
+				$state.go('checkin').then(function(){
+					$ionicHistory.removeBackView();
+				});
 			},
 			function(){
 				$scope.lockCode = false;

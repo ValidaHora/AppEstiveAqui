@@ -21,14 +21,18 @@ angular.module('starter.services')
 					pad(date.getUTCMinutes());
 	};
 	
-	var calcDate = function(){
+	var calcDate = function(removeSeconds){
 		var date = new Date();					
-		return date.getFullYear()+
+		var formated = date.getFullYear()+
 					pad(date.getMonth()+1)+
 					pad(date.getUTCDate())+
 					pad(date.getUTCHours())+
-					pad(date.getUTCMinutes())+
-					pad(date.getUTCSeconds());
+					pad(date.getUTCMinutes());
+		
+		if(removeSeconds!=true)
+			formated += pad(date.getUTCSeconds());
+		
+		return formated;
 	};
 	
 	var pad = function(num){

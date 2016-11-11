@@ -29,6 +29,7 @@ angular.module('starter.services')
 				var err
 				for( var i in serverResponse.Mensagens ){
 					msg = serverResponse.Mensagens[i];
+					
 					if(msg.Descricao){
 						errors.push(msg.Descricao);
 					}else if(msg.Mensagem){
@@ -67,6 +68,7 @@ angular.module('starter.services')
 						paramname = key+'['+i+']';
 						params[paramname] = paramvalue;
 					}
+					//params[key] = value;
 				}
 			}
 			
@@ -144,8 +146,13 @@ angular.module('starter.services')
 			return debugmode && !production;
 		};
 		
-		var connectionCheck = function(check){
-			connectionCheck = check;
+		var disableConnectionCheck = function(){
+			connectionCheck = false;
+			return this;
+		};
+		
+		var enableConnectionCheck = function(){
+			connectionCheck = true;
 			return this;
 		};
 		
@@ -173,8 +180,14 @@ angular.module('starter.services')
 		var transformRequest = function(obj) {
 			var qs = [];
 			for(var key in obj){
-				if( typeof obj[key] != 'undefined' )
-					qs.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
+				if( typeof obj[key] != 'undefined' ){
+					pname = key;
+					if(isGet()){
+						pname = key.replace(/\[\d*\]/, '');
+					}
+					//qs.push(encodeURIComponent(pname)+"="+encodeURIComponent(obj[key]));
+					qs.push(encodeURIComponent(pname)+"="+obj[key]);
+				}
 			}
 			
 			return qs.join("&");
@@ -299,11 +312,16 @@ angular.module('starter.services')
 		var failCallback = function(response){
 			if( response.status>=500 || response.status==-1 ){
 				hideLoader();
-				$ionicPopup.alert({
-					title: '<i class="icon ion-ios-information-outline"></i> Erro',
-					template: 'Não houve resposta do servidor',
-				});
 				
+				var message = 'Não houve resposta do servidor';
+				if(displayError){
+					$ionicPopup.alert({
+						title: '<i class="icon ion-ios-information-outline"></i> Erro',
+						template: message,
+					});
+				}
+				
+				deferred.reject({message: message, no_server_response: true});
 				return false;
 			}
 			
@@ -371,6 +389,8 @@ angular.module('starter.services')
 			setSilent: setSilent,
 			enableAutoError: enableAutoError,
 			disableAutoError: disableAutoError,
+			enableConnectionCheck: enableConnectionCheck,
+			disableConnectionCheck: disableConnectionCheck,
 			isAutoError: isAutoError,
 			request: request,
 			debug: enableDebug,

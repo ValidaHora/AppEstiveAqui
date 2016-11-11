@@ -61,9 +61,16 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	};
 	
 	$scope.fetch = function(){
-		if($scope.isLoged){
+		if($scope.isLoged && !$scope.hasFetchedUser){
+			$scope.hasFetchedUser = true;
 			ApiEstiveAqui.fetchUserData().then(function(){
 				$scope.history = EntryManager.get();
+				$scope.runSync();
+				
+				ApiValidaHora.getSeeds(PassClockManager.get(), false).request().then(function(seeds){
+					PassClockManager.mergeWithSeeds(seeds.Tokens);
+					PassClockManager.set(PassClockManager.get());
+				});
 			});
 		}
 	};
@@ -128,24 +135,31 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	$scope.calcHour = function(){
 		if($scope.hasNetwork){
-			ApiValidaHora.calcHour($scope.registerData.token.clock, $scope.registerData.token.code, $scope.registerData.typedTime, $scope.registerData.position).request().then(function(calculated){
+			ApiValidaHora.calcHour($scope.registerData.token.clock, $scope.registerData.token.code, $scope.registerData.typedTime, $scope.registerData.position).disableAutoError().request().then(function(calculated){
 				$scope.registerData.launchTime = calculated.HoraLancada;
 				$scope.registerData.hashCode = calculated.HashCode;
 				$scope.displaySuccess();
 				//$ionicLoading.hide();
+			}, function(err){
+				if(err.no_server_response==true){
+					$ionicLoading.hide();
+					$scope.displaySuccess();
+				}
 			});
 		}else{
 			$ionicLoading.hide();
 			$scope.displaySuccess();
 		}
-	}
+	};
 	
 	$scope.launchHour = function(){
 		var title = 'Sucesso';
 		var msg = 'Hora lançada com sucesso!';
 		
-		EntryManager.setSelection($scope.registerData.token.clock);
-		if($scope.hasNetwork){
+		selected = $scope.registerData.token;
+		EntryManager.setSelection(selected);
+		
+		//if(!$scope.hasNetwork)
 			ApiEstiveAqui.launchHour(
 				$scope.registerData.token.clock,
 				$scope.registerData.token.code,
@@ -154,12 +168,12 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				$scope.registerData.hashCode,
 				$scope.registerData.position,
 				$scope.registerData.note
-			).disableAutoError().request().then(
+			).disableConnectionCheck().disableAutoError().request().then(
 				function(launched){
 					//$scope.history.push(launched.Lancamento);
 					EntryManager.add(launched.Lancamento);
 					
-					selected = $scope.registerData.token.clock;
+					//selected = $scope.registerData.token.clock;
 					
 					$scope.history = EntryManager.get();
 					$scope.displayMain();
@@ -167,33 +181,133 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 					resetRegister();
 				},
 				function(err){
-					$scope.displayError('Tentar novamente', 'Não foi possivel lançar a hora', err.Mensagens[0].Mensagem);
+					var errorScreenConfig = {
+						button: null,
+						title: null,
+						message: null,
+					}
+					var needSchedule = false;
+					
+					if(!$scope.hasNetwork){
+						errorScreenConfig.title = 'Você não possui uma conexão com a internet.';
+						errorScreenConfig.message = 'Sua hora foi salva e sera lançada quando você estiver conectado.';
+						errorScreenConfig.button = 'Ok, entendi';
+						needSchedule = true;
+						
+					}else if(err.no_server_response==true){
+						errorScreenConfig.title = 'Não foi possível se comunicar com o servidor.';
+						errorScreenConfig.message = 'Sua hora foi salva e sera lançada quando for possível se comunicar com o servidor novamente.';
+						errorScreenConfig.button = 'Ok, entendi';
+						needSchedule = true;
+						
+					}else if(err.Mensagens){
+						errorScreenConfig.title = 'Não foi possivel lançar a hora';
+						errorScreenConfig.message = err.Mensagens[0].Mensagem;
+						errorScreenConfig.button = 'Tentar novamente';
+					
+					}else{
+						errorScreenConfig.title = 'Ops!';
+						errorScreenConfig.message = err;
+						errorScreenConfig.button = 'Tentar novamente';
+					}
+					
+					if(needSchedule){
+						EntryManager.schedule($scope.registerData);
+						$scope.history = EntryManager.get();
+						$scope.syncCount ++;
+					}
+					
 					resetRegister();
+					$scope.displayError(errorScreenConfig.button, errorScreenConfig.title, errorScreenConfig.message);
 				}
 			);
-		}else{
-			$scope.displayError('Ok, entendi', 'Você não possui uma conexão com a internet.', 'Sua hora foi salva e sera lançada quando você estiver conectado.');
+		/*}else{
+			$scope.displayError(, , );
 			EntryManager.schedule($scope.registerData);
+			$scope.history = EntryManager.get();
+			
 			$scope.syncCount ++;
 			resetRegister();
-		}
+		}*/
 	};
 	
 	$scope.runSync = function(){
 		if($scope.syncCount>0){
-			var data = $scope.sync[0];
-			//var removed = EntryManager.removeSync(data._id);
-			//return false;
-			ApiEstiveAqui.syncToken(data.token.clock, data.token.code, data.typedTime, data.position, data).then(function(launched){
-				var removed = EntryManager.removeSync(data._id);
-				$scope.syncCount --;
-				EntryManager.add(launched.Lancamento);
-				syncTimeout = setTimeout($scope.runSync, $scope.syncDelay);
+			var syncErrors = [];
+			var decSyncBy = 0;
+			
+			ApiValidaHora.calcHourBatch().setSilent(true).disableAutoError().request().then(function(responseHours){
+				var item, sync;
+				for(var i=0 in responseHours.Lancamentos){
+					item = responseHours.Lancamentos[i];
+					sync = EntryManager.findSyncById(item.IL);
+					
+					if(item.OK==true){
+						if(sync){
+							sync.hashCode = item.HC;
+							sync.launchedTime = item.HL;
+							sync.sendTime = TimeHelper.calcDate(true);
+							EntryManager.updateSync(sync);
+						}else{
+							$scope.removeFromSync(item.IL);
+						}
+					}else{
+						if(item.Erro.CE!=102){
+							syncErrors.push('['+sync.token.code+'] '+item.Erro.ER);
+							$scope.removeFromSync(item.IL);
+						}
+					}
+				}
 				
-				$scope.history = EntryManager.get();
-			});
+				ApiEstiveAqui.launchHourBatch(responseHours.Lancamentos).setSilent(true).request().then(function(responseLaunch){
+					var launched, sync;
+					for(var i=0 in responseLaunch.LNS){
+						launched = responseLaunch.LNS[i];
+						sync = EntryManager.findSyncById(launched.IL);
+						if(launched && (launched.OK==true) ){
+							if(sync){
+								EntryManager.addFromBatch(sync);
+								$scope.history = EntryManager.get();
+								
+								$scope.removeFromSync(launched.IL);
+							}else{
+								console.log('Sync ID['+launched.IL+'] not found in sync pool');
+							}
+						}else{
+							console.log('LANCA_HORAS_ITEM_ERRO', launched);
+							syncErrors.push('['+sync.token.code+'] '+launched.ER.ME);
+							
+							//if(launched.ER.CE==102){
+								$scope.removeFromSync(launched.IL);
+							//}
+						}
+					}
+					
+					if(syncErrors.length>0)
+						$scope.simpleAlert('Erro', syncErrors.join('<br />'));
+				});
+			})
 		}
 	};
+	
+	$scope.removeFromSync = function(id){
+		var removed = EntryManager.removeSync(id);
+		$scope.syncCount --;
+	};
+	
+	$scope.clockChange = function(){
+		
+		var clock = PassClockManager.find($scope.registerData.token.clock);
+		
+		if($scope.registerData.token.clock && (clock.seed && clock.seed.SMNT!="0")){
+			OTP.setSecret(clock.seed.SMNT);
+			OTP.start();
+		}else{
+			OTP.stop();
+			$scope.otpcode = 'xxxxxx';
+			$scope.timer = 0;
+		}
+	}
 	
 	var padToken = function(){
 		var tk = $scope.fakeToken.code;
@@ -205,7 +319,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	var tokenValidation = function(){
 		var token = $scope.registerData.token.code;
-		return validateOTP(token) || validateTest(token);
+		return (validateOTP(token) || validateTest(token)) || (User.getId()==$rootScope.APPLE_ID && token==$rootScope.APPLE_CODE);
 	};
 	
 	var validateOTP = function(token){
@@ -265,7 +379,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	var resetRegister = function(){
 		$scope.fakeToken.code = null;
-		$scope.registerData = { token:{code: null, clock:selected}, note: null, position:{coords:{latitude:0,longitude:0}}, typedTime:null};
+		$scope.registerData = { token:{code: null, clock:selected.clock, name:selected.name}, note: null, position:{coords:{latitude:0,longitude:0}}, typedTime:null};
+		$scope.clockChange();
 	};
 	
 	var selected 		= EntryManager.getSelection();
@@ -281,17 +396,18 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	$scope.sync 		= EntryManager.getSync();
 	$scope.syncCount 	= $scope.sync.length;
 	$scope.syncDelay 	= 60000;
-	$scope.history 		= [];
+	$scope.history 		= EntryManager.get();
 	$scope.isLoged 		= User.get().id!=undefined;
 	$scope.registerData = {};
 	$scope.fakeToken = {code:null};
 	$scope.otpcode = 'xxxxxx';
 	$scope.timer = 0;
 	$scope.fail = {button:null, title:null, message: null};
+	$scope.hasFetchedUser = false;
 	
 	resetRegister();
 	if(!$scope.isWeb){
-		$scope.hasNetwork = NetworkState.isOnline();
+		$scope.hasNetwork = false;//NetworkState.isOnline();
 		if($scope.hasNetwork && $scope.isLoged)
 			$scope.fetch();
 	}else{
@@ -299,43 +415,28 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	}
 	
 	$scope.$on("$ionicView.beforeEnter", function(event, data){
-		$scope.isLoged = User.get().id!=undefined;
+		var user = User.get();
+		
+		$scope.isLoged = user.id!=undefined;
 		if(!$scope.isLoged){
+			$scope.hasFetchedUser = false;
 			$ionicHistory.nextViewOptions({
 				disableAnimate: false,
 				disableBack: true,
 				historyRoot: true,
 			});
-			$state.go('activation');
+			$state.go('activation').then(function(){
+				$ionicHistory.removeBackView();
+			});
 		}else{
+			$scope.fetch();
 			$scope.clocks = PassClockManager.get();
 			if($scope.clocks.length==1){
 				$scope.registerData.token.clock = $scope.clocks[0].NumeroPassClock;
+				$scope.registerData.token.name = $scope.clocks[0].Apelido;
 			}
 		}
 	});
-	
-	
-	/*var isZeroStart = false;
-	$scope.$watch('fakeToken.code', function(newValue, oldValue) {
-		newValue = newValue+'';
-		if(newValue=='0'){
-			isZeroStart = true;
-		}else if(newValue=='null'){
-			isZeroStart = false;
-		}
-		
-		if(isZeroStart)
-			newValue = '0'+newValue;
-		
-		$scope.readyToLaunch = newValue && newValue.length>=6;
-		if($scope.readyToLaunch){
-			$scope.registerData.token.code = padToken();
-			$scope.fakeToken.code = parseInt(newValue.substr(0, 6));
-		}else{
-			return false;
-		}
-	});*/
 	
 	$rootScope.$on('NetworkState:online', $scope.toggleNetState);
 	$rootScope.$on('NetworkState:offline', $scope.toggleNetState);

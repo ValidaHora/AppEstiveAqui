@@ -14,6 +14,9 @@ angular.module('starter.services', [])
 	$rootScope.VH_BASE_URL = 'http://app.des.validahora.com.br/ValidaHora/';
 	$rootScope.EA_BASE_URL = 'http://app.des.estiveaqui.com.br/EstiveAqui/';
 	
+	$rootScope.APPLE_ID 	= 'apple';
+	$rootScope.APPLE_CODE 	= '230814';
+	
 	$ionicPlatform.ready(function() {
 		//console.log('UUID', window.device.uuid);
 		
@@ -41,7 +44,7 @@ angular.module('starter.services', [])
 		  	});
 		  	
 		  	return popup;
-		};		
+		};
 	});
 })
 

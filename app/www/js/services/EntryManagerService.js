@@ -5,7 +5,7 @@ angular.module('starter.services')
 	var KEY_ENTRIES_SELECTED = 'vh_pass_clocks_selected';
 	var entries = [];
 	var sync = [];
-	var selected = null;
+	var selected = {};
 	
 	var set = function(passclocks){
 		entries = passclocks;
@@ -27,6 +27,21 @@ angular.module('starter.services')
 	
 	var add = function(lancamento){
 		entries.push(lancamento);
+		save();
+	};
+	
+	var addFromBatch = function(sync){
+		entries.push({
+			CD: sync.token.code,
+			HL: sync.launchedTime,
+			PA: sync.token.name,
+			PC: sync.token.clock,
+			HC: sync.hashCode,
+			HD: sync.typedTime,
+			HE: sync.sendTime,
+			LAT: sync.position.coords.latitude,
+			LON: sync.position.coords.longitude,
+		});
 		save();
 	};
 	
@@ -74,7 +89,15 @@ angular.module('starter.services')
 		}
 		
 		return removed;
-	}
+	};
+	
+	var updateSync = function(newSync){
+		var index = findSyncById(newSync._id, true);
+		if(index){
+			sync[index] = newSync;
+			save();
+		}
+	};
 	
 	var schedule = function(data){
 		var index = sync.length-1;
@@ -110,11 +133,13 @@ angular.module('starter.services')
 	};
 	
 	var hash = function(){
-		var date = new Date();
+		/*var date = new Date();
 		var sha = new jsSHA("SHA-1", "TEXT");
 		var hash = null;
 		sha.update(date.getTime().toString()+Math.random());
-		hash = sha.getHash("HEX");
+		hash = sha.getHash("HEX");*/
+		var hash = null;
+		hash = Math.floor(Math.random() *99999)+1;
 		
 		return hash;
 	};
@@ -144,7 +169,7 @@ angular.module('starter.services')
 		LocalStorage.setObject(KEY_ENTRIES_SYNC, sync);
 		
 		if(selected)
-			LocalStorage.set(KEY_ENTRIES_SELECTED, selected);
+			LocalStorage.setObject(KEY_ENTRIES_SELECTED, selected);
 	};
 	
 	var load = function(){
@@ -157,7 +182,7 @@ angular.module('starter.services')
 		};
 		
 		if(LocalStorage.has(KEY_ENTRIES_SELECTED)){
-			selected = LocalStorage.get(KEY_ENTRIES_SELECTED);
+			selected = LocalStorage.getObject(KEY_ENTRIES_SELECTED);
 		};
 	}
 	
@@ -166,6 +191,7 @@ angular.module('starter.services')
 		set: set,
 		get: get,
 		add: add,
+		addFromBatch: addFromBatch,
 		getSync: getSync,
 		schedule: schedule,
 		removeSync: removeSync,
@@ -173,7 +199,9 @@ angular.module('starter.services')
 		findByClock: findByClock,
 		findSyncById: findSyncById,
 		findSyncByCode: findSyncByCode,
+		updateSync: updateSync,
 		setSelection: setSelection,
 		getSelection: getSelection,
+		load: load,
 	}
 });

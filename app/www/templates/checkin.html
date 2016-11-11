@@ -17,7 +17,7 @@
 					<div class="input-label">
 						Lançando hora em
 					</div>
-					<select ng-model="registerData.token.clock">
+					<select ng-model="registerData.token.clock" ng-change="clockChange()">
 						<option value="{{clock.NumeroPassClock}}" {{registerData.token.clock==clock.NumeroPassClock:'selected':''}} ng-repeat="clock in clocks" ng-if="clock.Status=='0'">{{clock.Apelido}}</option>
 					</select>
 				</label>

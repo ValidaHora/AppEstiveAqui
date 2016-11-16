@@ -30,7 +30,7 @@
 					<tbody>
 						<tr ng-repeat="item in history track by $index">
 							<td ng-class="{'not_launched': item.not_launched}">{{item.PA}}</td>
-							<td>{{item.HL | historyFormat}}</td>
+							<td>{{ item.not_launched ? '--' : (item.HL | historyFormat)}}</td>
 							<td>{{item.CD}}</td>
 						</tr>
 					</tbody>

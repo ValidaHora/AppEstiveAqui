@@ -1,5 +1,5 @@
 angular.module('starter.services')
-.factory('EntryManager', function(LocalStorage) {
+.factory('EntryManager', function(LocalStorage, PassClockManager) {
 	var KEY_ENTRIES = 'vh_pass_clocks_entries';
 	var KEY_ENTRIES_SYNC = 'vh_pass_clocks_entries_sync';
 	var KEY_ENTRIES_SELECTED = 'vh_pass_clocks_selected';
@@ -31,25 +31,42 @@ angular.module('starter.services')
 	};
 	
 	var addFromBatch = function(sync){
-		entries.push({
+		var clock = PassClockManager.find(sync.token.clock);
+		var entry = {
 			CD: sync.token.code,
 			HL: sync.launchedTime,
-			PA: sync.token.name,
+			PA: clock.Apelido,
 			PC: sync.token.clock,
 			HC: sync.hashCode,
 			HD: sync.typedTime,
 			HE: sync.sendTime,
 			LAT: sync.position.coords.latitude,
 			LON: sync.position.coords.longitude,
-		});
+		};
+		entries.push(entry);
 		save();
+	};
+	
+	var del = function(id){
+		var index = find(id, '_id', true);
+		var removed = false;
+		
+		if(index){
+			if(index){
+				entries.splice(index, 1);
+				removed = true;
+				save();
+			}
+		}
+		
+		return removed;
 	};
 	
 	var getSync = function(){
 		return sync;
 	};
 	
-	var findSyncById = function(id, retunrIndex){
+	var findSyncById = function(id, returnIndex){
 		var item = null;
 		var selected = null;
 		var index = null;
@@ -62,7 +79,7 @@ angular.module('starter.services')
 			}
 		}
 		
-		return (retunrIndex==true) ? index : selected;
+		return (returnIndex==true) ? index : selected;
 	};
 	
 	var findSyncByCode = function(code){
@@ -144,20 +161,22 @@ angular.module('starter.services')
 		return hash;
 	};
 	
-	var find = function(term, field){
+	var find = function(term, field, returnIndex){
 		var clock = null;
+		var index = null;
 		for(var i in entries){
 			if(entries[i][field]==term){
 				clock = entries[i];
+				index = i;
 				break;
 			}
 		}
 		
-		return clock;
+		return (returnIndex==true) ? index : clock;
 	};
 	
-	var findById = function(id){
-		var clock = find(id, 'ID');
+	var findById = function(id, returnIndex){
+		var clock = find(id, 'ID', returnIndex);
 	};
 	
 	var findByClock = function(passClockId){
@@ -191,6 +210,7 @@ angular.module('starter.services')
 		set: set,
 		get: get,
 		add: add,
+		del: del,
 		addFromBatch: addFromBatch,
 		getSync: getSync,
 		schedule: schedule,

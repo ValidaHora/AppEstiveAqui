@@ -266,9 +266,10 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 						sync = EntryManager.findSyncById(launched.IL);
 						if(launched && (launched.OK==true) ){
 							if(sync){
+								EntryManager.del(sync._id);
 								EntryManager.addFromBatch(sync);
-								$scope.history = EntryManager.get();
 								
+								$scope.history = EntryManager.get();
 								$scope.removeFromSync(launched.IL);
 							}else{
 								console.log('Sync ID['+launched.IL+'] not found in sync pool');
@@ -296,7 +297,6 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	};
 	
 	$scope.clockChange = function(){
-		
 		var clock = PassClockManager.find($scope.registerData.token.clock);
 		
 		if($scope.registerData.token.clock && (clock.seed && clock.seed.SMNT!="0")){
@@ -407,7 +407,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	resetRegister();
 	if(!$scope.isWeb){
-		$scope.hasNetwork = false;//NetworkState.isOnline();
+		$scope.hasNetwork = NetworkState.isOnline();
 		if($scope.hasNetwork && $scope.isLoged)
 			$scope.fetch();
 	}else{

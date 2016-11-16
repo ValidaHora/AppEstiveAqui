@@ -1,6 +1,6 @@
 angular.module('starter.controllers')
 .controller('ActivationTokenCtrl', function($scope, $state, $stateParams, $ionicHistory, ApiEstiveAqui){
-	$scope.token = {number:'CodNibles01'};
+	$scope.token = {number:null};
 	$scope.lockCode = false;//true;
 	
 	$scope.activate = function(){

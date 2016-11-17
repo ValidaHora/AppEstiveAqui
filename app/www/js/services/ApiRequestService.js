@@ -17,6 +17,9 @@ angular.module('starter.services')
 		var displayError = true;
 		var connectionCheck = true;
 		
+		var forever = false;
+		var isForceFail = false;
+		
 		var deferred = $q.defer();
 		var params = {};
 		var targetFile = null;
@@ -156,6 +159,16 @@ angular.module('starter.services')
 			return this;
 		};
 		
+		var enableForever = function(){
+			forever = true;
+			return this;
+		};
+		
+		var forceFail = function(){
+			isForceFail = true;
+			return this;
+		};
+		
 		var needConnecttionCheck = function(){
 			return connectionCheck;
 		};
@@ -205,7 +218,8 @@ angular.module('starter.services')
 			catch(exception) {
 				console.log('JSON.parse() error: '+exception);
 				hideLoader();
-				displayFatalError(resp);
+				if(displayError)
+					displayFatalError(resp);
 				
 				return false;
 			}
@@ -301,6 +315,11 @@ angular.module('starter.services')
 		}
 		
 		var successCallback = function(response){
+			if(isForceFail)
+				response.data = false;
+			
+			//appendLog(response);
+			
 			serverResponse = extractResponse(response);
 			if(response.data.ValidadoOk){
 				deferred.resolve(serverResponse);
@@ -310,7 +329,9 @@ angular.module('starter.services')
 		};
 		
 		var failCallback = function(response){
-			if( response.status>=500 || response.status==-1 ){
+			//appendLog(response);
+			
+			if( (response.status>=500 || response.status==-1) || (forever==true) ){
 				hideLoader();
 				
 				var message = 'Não houve resposta do servidor';
@@ -337,7 +358,8 @@ angular.module('starter.services')
 						template: self.getErrors().join('<br>'),
 					});
 				}
-			}else{
+			}else if(forever==false){
+				//appendLog('FailCallback FOREVER '+(forever));
 				displayFatalError(response);
 			}
 			
@@ -348,7 +370,8 @@ angular.module('starter.services')
 			var response = null;
 			if( resp.response ){
 				response = transformResponse(resp.response);
-			}else{
+			
+			}else if(resp.data && (resp.data!=false)){
 				response = resp.data;
 			}
 			
@@ -359,7 +382,7 @@ angular.module('starter.services')
 			console.log('Fatal Error!');
 			console.log(response);
 			fatalError = true;
-			alert('Hic Sunt Dracones');
+			alert('Ops! Algo grave aconteceu.');
 		};
 		
 		var displayDebug = function(url){
@@ -377,6 +400,22 @@ angular.module('starter.services')
 					}
 				}
 			}
+		};
+		
+		
+		
+		var appendLog = function(entry){
+			var log = entry;
+			
+			try {
+				log = JSON.stringify(entry);
+			}catch(e){
+				log = 'Entry is not an json: '+entry;
+			}
+			
+			$rootScope.logentries.unshift('<br><br><br><br>');
+			$rootScope.logentries.unshift(log);
+			$rootScope.logentries.unshift(getRequestUrl());
 		};
 		
 		return {			
@@ -398,6 +437,9 @@ angular.module('starter.services')
 			
 			displayLoader: displayLoader,
 			hideLoader: hideLoader,
+			
+			enableForever: enableForever,
+			forceFail: forceFail,
 		};
 	};
 	

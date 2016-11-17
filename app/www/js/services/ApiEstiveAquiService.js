@@ -20,7 +20,7 @@ angular.module('starter.services')
 		return call('LeAppUsuario', {IDAPP: User.getId()}).request().then(
 			function(response){
 				PassClockManager.set(response.PassClocks);
-				EntryManager.set(response.Lancamentos);
+				EntryManager.set(response.Lancamentos.reverse());
 				
 				return response;
 			},

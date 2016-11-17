@@ -26,7 +26,7 @@ angular.module('starter.services')
 	};
 	
 	var add = function(lancamento){
-		entries.push(lancamento);
+		entries.unshift(lancamento);
 		save();
 	};
 	
@@ -43,7 +43,7 @@ angular.module('starter.services')
 			LAT: sync.position.coords.latitude,
 			LON: sync.position.coords.longitude,
 		};
-		entries.push(entry);
+		entries.unshift(entry);
 		save();
 	};
 	

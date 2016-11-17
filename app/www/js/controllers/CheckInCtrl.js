@@ -10,16 +10,33 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		$scope.modal = modal;
 	});
 	
+	$ionicModal.fromTemplateUrl('templates/log.html', {
+		scope: $scope,
+		animation: 'slide-in-up'
+	}).then(function(modal) {
+		$scope.modalLog = modal;
+	});
+	
 	$scope.displayHistory = function() {
 		$scope.modal.show();
 	};
+	
 	$scope.hideHistory = function() {
 		$scope.modal.hide();
+	};
+	
+	$scope.displayLog = function() {
+		$scope.modalLog.show();
+	};
+	
+	$scope.hideLog = function() {
+		$scope.modalLog.hide();
 	};
 	
 	// Cleanup the modal when we're done with it!
 	$scope.$on('$destroy', function() {
 		$scope.modal.remove();
+		$scope.modalLog.remove();
 	});
 		
 	$scope.toggleNetState = function(event, netState){
@@ -64,13 +81,21 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		if($scope.isLoged && !$scope.hasFetchedUser){
 			$scope.hasFetchedUser = true;
 			ApiEstiveAqui.fetchUserData().then(function(){
+				ApiValidaHora.getSeeds(PassClockManager.get(), false).request().then(function(seeds){
+					var clocks;
+					PassClockManager.mergeWithSeeds(seeds.Tokens);
+					clocks = PassClockManager.get();
+					
+					PassClockManager.set(clocks);
+					if(clocks.length==1){
+						selected.clock = clocks[0].NumeroPassClock;
+						selected.name = clocks[0].Apelido;
+						EntryManager.setSelection(selected);
+						$scope.clockChange();
+					}
+				});
 				$scope.history = EntryManager.get();
 				$scope.runSync();
-				
-				ApiValidaHora.getSeeds(PassClockManager.get(), false).request().then(function(seeds){
-					PassClockManager.mergeWithSeeds(seeds.Tokens);
-					PassClockManager.set(PassClockManager.get());
-				});
 			});
 		}
 	};
@@ -135,7 +160,12 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	$scope.calcHour = function(){
 		if($scope.hasNetwork){
-			ApiValidaHora.calcHour($scope.registerData.token.clock, $scope.registerData.token.code, $scope.registerData.typedTime, $scope.registerData.position).disableAutoError().request().then(function(calculated){
+			ApiValidaHora.calcHour(
+				$scope.registerData.token.clock,
+				$scope.registerData.token.code,
+				$scope.registerData.typedTime,
+				$scope.registerData.position
+			).disableAutoError().enableForever().request().then(function(calculated){
 				$scope.registerData.launchTime = calculated.HoraLancada;
 				$scope.registerData.hashCode = calculated.HashCode;
 				$scope.displaySuccess();
@@ -168,7 +198,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				$scope.registerData.hashCode,
 				$scope.registerData.position,
 				$scope.registerData.note
-			).disableConnectionCheck().disableAutoError().request().then(
+			).disableConnectionCheck().disableAutoError().enableForever().request().then(
 				function(launched){
 					//$scope.history.push(launched.Lancamento);
 					EntryManager.add(launched.Lancamento);
@@ -304,8 +334,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 			OTP.start();
 		}else{
 			OTP.stop();
-			$scope.otpcode = 'xxxxxx';
-			$scope.timer = 0;
+			/*$scope.otpcode = 'xxxxxx';
+			$scope.timer = 0;*/
 		}
 	}
 	
@@ -440,11 +470,11 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	$rootScope.$on('NetworkState:online', $scope.toggleNetState);
 	$rootScope.$on('NetworkState:offline', $scope.toggleNetState);
-	$rootScope.$on('OTP:tick', function(event, otpcode, remaining){
+	/*$rootScope.$on('OTP:tick', function(event, otpcode, remaining){
 		$scope.otpcode = otpcode;
 		$scope.timer = remaining;
 		$scope.$apply();
-	});
+	});*/
 });
 
 angular.module('starter.controllers').directive('tokenlimit', function(){
@@ -458,6 +488,7 @@ angular.module('starter.controllers').directive('tokenlimit', function(){
 					e.preventDefault();
 				}
 				$scope.$apply();
+				console.log('keypress', this.value);
             });
             
             $element.on("keyup", function(e) {
@@ -466,6 +497,7 @@ angular.module('starter.controllers').directive('tokenlimit', function(){
 					$scope.registerData.token.code = this.value;//padToken();
 				}
 				$scope.$apply();
+				console.log('keyup', this.value);
 			});
         }
     }

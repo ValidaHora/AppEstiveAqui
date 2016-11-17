@@ -102,7 +102,7 @@ select {
 	background: none;
 	border: none;
 	border-bottom: 1px solid rgba(255,255,255,0.4);
-	font-size: 26px;
+	font-size: 20px;
     text-align: center;
     font-weight: bold;
     color: #DDD;
@@ -125,6 +125,10 @@ select {
 .sucesso .row+.row,
 .erro .row+.row {
 	margin-top: 10px
+}
+
+div.title.title-center.header-item {
+	left: 53px !important;
 }
 
 /* MENU

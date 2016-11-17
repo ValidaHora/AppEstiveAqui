@@ -15,9 +15,9 @@
 			<div class="list local" ng-if="clocks.length>1">
 				<label class="item item-input item-select" >
 					<div class="input-label">
-						Lançando hora em
+						Lançando em
 					</div>
-					<select ng-model="registerData.token.clock" ng-change="clockChange()">
+					<select name="passclocks" ng-model="registerData.token.clock" ng-change="clockChange()">
 						<option value="{{clock.NumeroPassClock}}" {{registerData.token.clock==clock.NumeroPassClock:'selected':''}} ng-repeat="clock in clocks" ng-if="clock.Status=='0'">{{clock.Apelido}}</option>
 					</select>
 				</label>
@@ -26,7 +26,7 @@
 			<div class="row">
 				<div class="col col-80 col-offset-10 inserir-codigo">
 					<img src="img/relogio.png" />
-					<input type="number" pattern="[0-9]" name="token" placeholder="Inserir código" ng-model="fakeToken.code" tokenlimit id="code" autofocus="true" />
+					<input type="tel" name="token" placeholder="Inserir código" ng-model="fakeToken.code" tokenlimit id="code" />
 				</div>
 			</div>
 			<div class="row">
@@ -34,14 +34,22 @@
 					<button class="button button-block button-positive lancar-hora" ng-click="registerToken()" ng-disabled="!readyToLaunch">Lançar hora</button>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col text-center margin-top">
-					<a ng-click="">{{timer}} - {{otpcode}}</a>
-				</div>
-			</div>
+			
 			<div class="row">
 				<div class="col text-center margin-top">
 					<a ng-click="displayHistory()">Veja todas as horas lançadas hoje</a>
+				</div>
+			</div>
+			
+			<div class="row" ng-if="false">
+				<div class="col text-center margin-top">
+					{{timer}} - {{otpcode}}
+				</div>
+			</div>
+			
+			<div class="row" ng-if="false">
+				<div class="col text-center margin-top">
+					<a ng-click="displayLog()">LOG</a>
 				</div>
 			</div>
 		</div>

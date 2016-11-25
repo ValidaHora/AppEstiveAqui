@@ -181,9 +181,17 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				$scope.displaySuccess();
 				//$ionicLoading.hide();
 			}, function(err){
+				
 				if(err.no_server_response==true){
 					$ionicLoading.hide();
 					$scope.displaySuccess();
+				}else{
+					var errors = [];
+					for(var i in err.Mensagens){
+						errors.push(err.Mensagens[i].Descricao);
+					}
+					
+					$scope.simpleAlert('Erro', errors.join('<br>'));
 				}
 			});
 		}else{
@@ -292,10 +300,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 							$scope.removeFromSync(item.IL);
 						}
 					}else{
-						if(item.Erro.CE!=102){
-							syncErrors.push('['+sync.token.code+'] '+item.Erro.ER);
-							$scope.removeFromSync(item.IL);
-						}
+						syncErrors.push('['+sync.token.code+'] '+item.Erro.ER);
+						$scope.removeFromSync(item.IL);
 					}
 				}
 				
@@ -315,7 +321,6 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 								console.log('Sync ID['+launched.IL+'] not found in sync pool');
 							}
 						}else{
-							console.log('LANCA_HORAS_ITEM_ERRO', launched);
 							syncErrors.push('['+sync.token.code+'] '+launched.ER.ME);
 							
 							//if(launched.ER.CE==102){

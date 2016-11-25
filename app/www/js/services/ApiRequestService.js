@@ -331,10 +331,10 @@ angular.module('starter.services')
 		var failCallback = function(response){
 			//appendLog(response);
 			
-			if( (response.status>=500 || response.status==-1) || (forever==true) ){
+			if( (response.status>=500 || response.status==-1) /*|| (forever==true)*/ ){
 				hideLoader();
 				
-				var message = 'Não houve resposta do servidor';
+				var message = 'Não houve resposta do servidor.';
 				if(displayError){
 					$ionicPopup.alert({
 						title: '<i class="icon ion-ios-information-outline"></i> Erro',

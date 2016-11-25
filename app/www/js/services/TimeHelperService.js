@@ -12,6 +12,13 @@ angular.module('starter.services')
 		return gmt;
 	};
 	
+	var resetTimezone = function(date){
+		var hours = date.getTimezoneOffset() / 60;
+		date.setHours( date.getHours()-hours );
+		
+		return date;
+	};
+	
 	var entryDate = function(){
 		var date = new Date();		
 		return date.getFullYear()+
@@ -71,6 +78,7 @@ angular.module('starter.services')
 	return {
 		timezone: timezone,
 		getTimeZone: getTimeZone,
+		resetTimezone: resetTimezone,
 		entryDate: entryDate,
 		calcDate: calcDate,
 		toDate: toDate,

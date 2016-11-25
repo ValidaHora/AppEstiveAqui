@@ -4,7 +4,7 @@ angular.module('starter.services')
 	return {
 		link: function($scope, element) {
 			element.on('click', function() {
-				$message = 'Compartilhar App';
+				$message = 'Baixe agora o estive aqui, o sistema de lançamento de horas prático, seguro, e na nuvem.\n\nhttp://www.validahora.com.br';
 				$cordovaSocialSharing.share($message/*, image, link*/).then(
 					function(result){
 						console.log(result);
@@ -25,9 +25,9 @@ angular.module('starter.services')
 			element.on('click', function() {
 				var url;
 				if($scope.isDroid)
-					url = 'market://details?id=no.app.yet';
+					url = 'market://details?id=br.com.dopaminamob.validahora';
 				else
-					url = 'itms-apps://itunes.apple.com/app/id-no-app-yet';
+					url = 'itms-apps://itunes.apple.com/app/id1169693954';
 				
 				$cordovaInAppBrowser.open(url, '_system').then(function(event) {
 				//$cordovaInAppBrowser.open('https://play.google.com/store/apps/details?id=com.dopaminamob.palavrasdosenhor').then(function(event) {

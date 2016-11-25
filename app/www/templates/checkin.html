@@ -1,4 +1,4 @@
-<ion-view view-title="Valida Hora">
+<ion-view view-title="Estive Aqui">
 	<ion-nav-buttons side="right">
 		<button class="button button-clear button-positive" ng-click="toggleNetRM()">
 			<img ng-src="img/satelite{{hasNetwork?'On':'Off'}}.png" />
@@ -26,7 +26,7 @@
 			<div class="row">
 				<div class="col col-80 col-offset-10 inserir-codigo">
 					<img src="img/relogio.png" />
-					<input type="tel" name="token" placeholder="Inserir código" ng-model="fakeToken.code" tokenlimit id="code" />
+					<input type="tel" name="token" placeholder="Inserir código" ng-model="fakeToken.code" tokenlimit id="code" autofocus="false" ng-focus="false" />
 				</div>
 			</div>
 			<div class="row">

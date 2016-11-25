@@ -19,5 +19,208 @@ $dark:                            #444 !default;
 $ionicons-font-path: "../lib/ionic/fonts" !default;
 
 // Include all of Ionic
+
+$positive: #139DF2;
+$dark: #FFF;
+$appbg: #073D5E;
+
 @import "www/lib/ionic/scss/ionic";
+
+body, .pane, .view, ion-view {
+	background: $appbg;
+}
+
+body, .pane, .view, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+	color: #FFF !important;
+}
+
+a { 
+	color: #FFF;
+	text-decoration: none;
+}
+
+textarea {
+	width: 100%;
+	resize: none;
+	border-radius: 5px;
+}
+
+.popup {
+	color: #000;
+}
+
+.popup-head {
+	background-color: $positive;
+	padding: 8px 10px;
+}
+.popup-head h3 {
+	color: #FFF;
+}
+.popup-body {
+	padding: 20px;
+}
+
+.popup-buttons {
+	padding-top: 10px;
+	padding-left: 30px;
+	padding-bottom: 20px;
+	padding-right: 30px;
+}
+
+.popup-buttons .button {
+	border-radius: 8px;
+}
+/*.popup-body *{
+	color: #000 !important;
+}*/
+
+.text-center { text-align: center }
+
+.margin { margin: 1.5em }
+.margin-top { margin-top: 1.5em }
+.margin-right { margin-right: 1.5em }
+.margin-bottom { margin-bottom: 1.5em }
+.margin-left { margin-left: 1.5em }
+
+/* BAR HEADER
+================================== */
+.bar-header {
+	background: #139DF2;
+	color: #FFF;
+}
+
+.bar-header .h1, .bar-header h1,
+.bar-header .button,
+.bar-header .button:hover {
+	color: #FFF;
+}
+
+.bar .title {
+	position: relative;
+	line-height: 34px;	
+}
+
+.bar-header .bt-header {
+	position: absolute;
+	right: 10px;
+}
+
+.bar-header .button .badge {
+	position: absolute;
+    top: 12px;
+    right: -5px;
+    padding: 1px 6px;
+    font-size: 12px;
+    /*border: 1px solid #000;*/
+}
+
+/* SELECIONAR TOKEN
+================================== */
+.list.local {
+	width: 100%;
+	border-bottom: 1px solid #2A84B7;
+}
+
+.list.local .item,
+.list.local .item .input-label,
+.list.local .item-select select { 
+	background: $appbg;
+	color: #FFF;
+}
+
+select {
+	color: #FFF;
+	font-size: 18px;
+}
+
+.inserir-codigo { padding: 40px 0 }
+
+.inserir-codigo img { 
+	float: left;
+	margin-right: 9px;
+}
+
+.inserir-codigo input {
+	background: none;
+	border: none;
+	border-bottom: 1px solid rgba(255,255,255,0.4);
+	font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+    color: #FFF;
+    width: 80%;
+}
+
+.lancar-hora { 
+	font-size: 1.5em;
+    font-weight: bold;
+    padding: 0.3em 0;
+}
+
+/* SUCESSO / ERRO
+================================== */
+.sucesso,
+.erro {
+	font-size: 1.3em
+}
+
+.sucesso .row+.row,
+.erro .row+.row {
+	margin-top: 10px
+}
+
+div.title.title-center.header-item {
+	left: 53px !important;
+}
+
+/* MENU
+================================== */
+.logoMenu {
+	width: 100%;
+	background-color: $positive;
+	padding: 45px;
+}
+
+.item { 
+	border: none;
+	color: #000 !important;
+}
+
+.item.active { 
+	background: #FFF;
+	color: #2A84B7 !important;
+}
+
+/* HISTÓRICO
+================================== */
+.title h2 {
+	color: #FFF;
+	font-size: 1.5em;
+	text-align: center;
+	font-weight: bold;
+}
+
+table {
+	width: 100%;
+	background: #FFF;
+}
+
+table thead th,
+table tbody td {
+	padding: 10px 0;
+	text-align: center;
+	color: #777;
+}
+
+table thead th {
+	background: #494949;
+	color: #FFF;
+	font-weight: bold;
+}
+
+table tbody tr:nth-child(2n) td { background: #D6D6D6 }
+
+.not_launched {
+	font-weight: bold;
+}
 

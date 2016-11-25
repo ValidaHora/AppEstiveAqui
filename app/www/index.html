@@ -5,12 +5,10 @@
 	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
 	<title></title>
 
-	<link href="lib/ionic/css/ionic.css" rel="stylesheet">
-	<link href="css/style.css" rel="stylesheet">
 
-		<!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
-		<link href="css/ionic.app.css" rel="stylesheet">
-	-->
+    <!-- compiled css output -->
+	<link href="css/ionic.app.min.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
 
 	<!-- ionic/angularjs js -->
 	<script src="lib/ionic/js/ionic.bundle.js"></script>
@@ -102,20 +100,12 @@
 		<!-- Left menu -->
 		<ion-side-menu side="left">
 			<div class="logoMenu">
-				<img src="img/validahoraMenu.png" />
+				<img src="img/validahoraMenu.png" width="100%" />
 			</div>
 			<ul class="list">
 				<a class="item item-icon-left" ui-sref="checkin" menu-close>
 					<i class="icon"><img src="img/lancarHoraMenu.png" /></i>
 					Lançar hora
-				</a>
-				<a class="item item-icon-left" href="#" menu-close>
-					<i class="icon"><img src="img/avaliarMenu.png" /></i>
-					Avaliar app
-				</a>
-				<a class="item item-icon-left" href="#" menu-close>
-					<i class="icon"><img src="img/compartilharMenu.png" /></i>
-					Compartilhar app
 				</a>
 				<a class="item item-icon-left" ui-sref="about" menu-close>
 					<i class="icon"><img src="img/sobreMenu.png" /></i>
@@ -124,6 +114,14 @@
 				<a class="item item-icon-left" ui-sref="howwork" menu-close>
 					<i class="icon"><img src="img/comoFuncionaMenu.png" /></i>
 					Como funciona
+				</a>
+				<a class="item item-icon-left" menu-close share-app>
+					<i class="icon"><img src="img/compartilharMenu.png" /></i>
+					Compartilhar app
+				</a>
+				<a class="item item-icon-left" menu-close rate-app>
+					<i class="icon"><img src="img/avaliarMenu.png" /></i>
+					Avaliar app
 				</a>
 			</ul>
 		</ion-side-menu>

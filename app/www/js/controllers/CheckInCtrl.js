@@ -87,6 +87,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 					clocks = PassClockManager.get();
 					
 					PassClockManager.set(clocks);
+					
+					$scope.clocks = clocks;
 					if(clocks.length==1){
 						selected.clock = clocks[0].NumeroPassClock;
 						selected.name = clocks[0].Apelido;
@@ -118,7 +120,6 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 			$ionicLoading.show();
 			
 			function hasLocationCallback(available){
-				
 				if(available){
 					$cordovaGeolocation.getCurrentPosition({timeout:3000, enableHighAccuracy:false}).then(function(pos){
 						$scope.registerData.position.coords.latitude = pos.coords.latitude;
@@ -150,10 +151,16 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				$scope.calcHour();
 			}
 			
-			if(typeof cordova!='undefined'){
-				cordova.plugins.diagnostic.isLocationAvailable(hasLocationCallback, noLocationCallback);
+			if($scope.registerData.token.code!=$rootScope.APPLE_CODE){
+				if(typeof cordova!='undefined'){
+					cordova.plugins.diagnostic.isLocationAvailable(hasLocationCallback, noLocationCallback);
+				}else{
+					hasLocationCallback(true);
+				}
 			}else{
-				hasLocationCallback(true);
+				$ionicLoading.hide();
+				$scope.simpleAlert('Sucesso', 'Hora lançada com sucesso!');
+				resetRegister();
 			}
 		}
 	};
@@ -349,7 +356,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	
 	var tokenValidation = function(){
 		var token = $scope.registerData.token.code;
-		return (validateOTP(token) || validateTest(token)) || (User.getId()==$rootScope.APPLE_ID && token==$rootScope.APPLE_CODE);
+		return (validateOTP(token) || (token==$rootScope.APPLE_CODE) || ($scope.isTestMode && validateTest(token)) );
 	};
 	
 	var validateOTP = function(token){
@@ -424,7 +431,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	$scope.errorMessage = null;
 	$scope.hasNetwork 	= false;
 	$scope.sync 		= EntryManager.getSync();
-	$scope.syncCount 	= $scope.sync.length;
+	$scope.syncCount 	= 
+	$scope.sync.length;
 	$scope.syncDelay 	= 60000;
 	$scope.history 		= EntryManager.get();
 	$scope.isLoged 		= User.get().id!=undefined;
@@ -438,8 +446,9 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	resetRegister();
 	if(!$scope.isWeb){
 		$scope.hasNetwork = NetworkState.isOnline();
-		if($scope.hasNetwork && $scope.isLoged)
-			$scope.fetch();
+		if($scope.hasNetwork && $scope.isLoged){
+			//$scope.fetch();
+		}
 	}else{
 		$scope.hasNetwork = true;
 	}

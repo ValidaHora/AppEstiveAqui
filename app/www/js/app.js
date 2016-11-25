@@ -10,12 +10,19 @@ angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers', 'starter
 angular.module('starter.filters', []);
 angular.module('starter.controllers', []);
 angular.module('starter.services', [])
-.run(function($ionicPlatform, $rootScope, $ionicPopup, $cordovaDevice) {
-	$rootScope.VH_BASE_URL = 'http://app.des.validahora.com.br/ValidaHora/';
-	$rootScope.EA_BASE_URL = 'http://app.des.estiveaqui.com.br/EstiveAqui/';
+.run(function($ionicPlatform, $rootScope, $ionicPopup, $cordovaDevice, $cordovaGeolocation) {
+	$rootScope.isTestMode = true;
+	
+	if( $rootScope.isTestMode){
+		$rootScope.VH_BASE_URL = 'http://app.des.validahora.com.br/ValidaHora/';
+		$rootScope.EA_BASE_URL = 'http://app.des.estiveaqui.com.br/EstiveAqui/';
+	}else{
+		$rootScope.VH_BASE_URL = 'http://app.validahora.com.br/ValidaHora/';
+		$rootScope.EA_BASE_URL = 'http://app.estiveaqui.com.br/EstiveAqui/';
+	}
 	
 	$rootScope.APPLE_ID 	= 'apple';
-	$rootScope.APPLE_CODE 	= '230814';
+	$rootScope.APPLE_CODE 	= '666666';
 	
 	$ionicPlatform.ready(function() {
 		//console.log('UUID', window.device.uuid);
@@ -48,6 +55,8 @@ angular.module('starter.services', [])
 		  	
 		  	return popup;
 		};
+		
+		$cordovaGeolocation.getCurrentPosition({timeout:3000, enableHighAccuracy:false})
 	});
 })
 

@@ -26,7 +26,9 @@
 			<div class="row">
 				<div class="col col-80 col-offset-10 inserir-codigo">
 					<img src="img/relogio.png" />
-					<input type="tel" name="token" placeholder="Inserir código" ng-model="fakeToken.code" tokenlimit id="code" autofocus="false" ng-focus="false" />
+					<span ng-click="checkLimit()">
+					<input tokenlimit type="tel" id="code" name="token" placeholder="Inserir código" ng-model="fakeToken.code" ng-disabled="limit.total==limit.max" />
+					</span>
 				</div>
 			</div>
 			<div class="row">

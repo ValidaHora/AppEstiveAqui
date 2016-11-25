@@ -1,5 +1,5 @@
 angular.module('starter.services')
-.factory('EntryManager', function(LocalStorage, PassClockManager) {
+.factory('EntryManager', function(LocalStorage, PassClockManager, TimeHelper) {
 	var KEY_ENTRIES = 'vh_pass_clocks_entries';
 	var KEY_ENTRIES_SYNC = 'vh_pass_clocks_entries_sync';
 	var KEY_ENTRIES_SELECTED = 'vh_pass_clocks_selected';
@@ -15,6 +15,28 @@ angular.module('starter.services')
 	var get = function(){
 		return entries;
 	};
+	
+	var getTodayLaunches = function(){
+		var launches = [];
+		var entry;
+		var entrydate;
+		var date = new Date();
+		var day = date.getDate();
+		
+		for(var i=0 in entries){
+			entrydate = TimeHelper.resetTimezone( TimeHelper.toDate(entries[i].HL) );
+			
+			if( entrydate.getDate()==day ){
+				launches.push(entries[i]);
+			}
+		}
+		
+		return launches;
+	}
+	
+	var getTodayLaunchesCount = function(){
+		return getTodayLaunches().length;
+	}
 	
 	var setSelection = function(selection){
 		selected = selection;
@@ -64,36 +86,6 @@ angular.module('starter.services')
 	
 	var getSync = function(){
 		return sync;
-	};
-	
-	var findSyncById = function(id, returnIndex){
-		var item = null;
-		var selected = null;
-		var index = null;
-		
-		for( var i in sync){
-			item = sync[i];
-			if(item._id==id){
-				selected = item;
-				index = i;
-			}
-		}
-		
-		return (returnIndex==true) ? index : selected;
-	};
-	
-	var findSyncByCode = function(code){
-		var item = null;
-		var selected = null;
-		
-		for( var i in sync){
-			item = sync[i];
-			if(item.token.code==code){
-				selected = item;
-			}
-		}
-		
-		return selected;
 	};
 	
 	var removeSync = function(id){
@@ -149,6 +141,7 @@ angular.module('starter.services')
 		};
 	};
 	
+	
 	var hash = function(){
 		/*var date = new Date();
 		var sha = new jsSHA("SHA-1", "TEXT");
@@ -161,6 +154,8 @@ angular.module('starter.services')
 		return hash;
 	};
 	
+	
+	//finds
 	var find = function(term, field, returnIndex){
 		var clock = null;
 		var index = null;
@@ -183,6 +178,37 @@ angular.module('starter.services')
 		var clock = find(passClockId, 'PC ');
 	};
 	
+	var findSyncById = function(id, returnIndex){
+		var item = null;
+		var selected = null;
+		var index = null;
+		
+		for( var i in sync){
+			item = sync[i];
+			if(item._id==id){
+				selected = item;
+				index = i;
+			}
+		}
+		
+		return (returnIndex==true) ? index : selected;
+	};
+	
+	var findSyncByCode = function(code){
+		var item = null;
+		var selected = null;
+		
+		for( var i in sync){
+			item = sync[i];
+			if(item.token.code==code){
+				selected = item;
+			}
+		}
+		
+		return selected;
+	};
+	
+	//save & load
 	var save = function(){
 		LocalStorage.setObject(KEY_ENTRIES, entries);
 		LocalStorage.setObject(KEY_ENTRIES_SYNC, sync);
@@ -223,5 +249,6 @@ angular.module('starter.services')
 		setSelection: setSelection,
 		getSelection: getSelection,
 		load: load,
+		getTodayLaunchesCount: getTodayLaunchesCount,
 	}
 });

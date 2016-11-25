@@ -80,7 +80,10 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	$scope.fetch = function(){
 		if($scope.isLoged && !$scope.hasFetchedUser){
 			$scope.hasFetchedUser = true;
-			ApiEstiveAqui.fetchUserData().then(function(){
+			ApiEstiveAqui.fetchUserData().then(function(userData){
+				$scope.limit.max = userData.XL;
+				$scope.limit.total = EntryManager.getTodayLaunchesCount();
+				
 				ApiValidaHora.getSeeds(PassClockManager.get(), false).request().then(function(seeds){
 					var clocks;
 					PassClockManager.mergeWithSeeds(seeds.Tokens);
@@ -209,9 +212,9 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				function(launched){
 					//$scope.history.push(launched.Lancamento);
 					EntryManager.add(launched.Lancamento);
-					
 					//selected = $scope.registerData.token.clock;
 					
+					$scope.limit.total = EntryManager.getTodayLaunchesCount();
 					$scope.history = EntryManager.get();
 					$scope.displayMain();
 					$scope.simpleAlert(title, msg);
@@ -321,6 +324,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 						}
 					}
 					
+					$scope.limit.total = EntryManager.getTodayLaunchesCount();
 					if(syncErrors.length>0)
 						$scope.simpleAlert('Erro', syncErrors.join('<br />'));
 				});
@@ -343,6 +347,13 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 			OTP.stop();
 			/*$scope.otpcode = 'xxxxxx';
 			$scope.timer = 0;*/
+		}
+	}
+	
+	$scope.checkLimit = function(){
+		console.log($scope.limit);
+		if( $scope.limit.total == $scope.limit.max ){
+			$scope.simpleAlert('Erro', 'Você atingiu seu limite de '+$scope.limit.max+' lançamentos diários');
 		}
 	}
 	
@@ -431,7 +442,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	$scope.errorMessage = null;
 	$scope.hasNetwork 	= false;
 	$scope.sync 		= EntryManager.getSync();
-	$scope.syncCount 	= 
+	$scope.syncCount 	= $scope.sync.length;
 	$scope.sync.length;
 	$scope.syncDelay 	= 60000;
 	$scope.history 		= EntryManager.get();
@@ -441,6 +452,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	$scope.otpcode = 'xxxxxx';
 	$scope.timer = 0;
 	$scope.fail = {button:null, title:null, message: null};
+	$scope.limit = {max: 0, total: 0};
 	$scope.hasFetchedUser = false;
 	
 	resetRegister();
@@ -497,7 +509,6 @@ angular.module('starter.controllers').directive('tokenlimit', function(){
 					e.preventDefault();
 				}
 				$scope.$apply();
-				console.log('keypress', this.value);
             });
             
             $element.on("keyup", function(e) {
@@ -506,7 +517,6 @@ angular.module('starter.controllers').directive('tokenlimit', function(){
 					$scope.registerData.token.code = this.value;//padToken();
 				}
 				$scope.$apply();
-				console.log('keyup', this.value);
 			});
         }
     }

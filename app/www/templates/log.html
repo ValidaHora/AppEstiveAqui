@@ -1,0 +1,12 @@
+<ion-modal-view>
+	<ion-header-bar>
+		<h1 class="title">LOG</h1>
+		<button class="button button-clear button-primary" ng-click="hideLog()">Fechar</button>
+	</ion-header-bar>
+	<ion-content style="color: #000">
+		<div class="row" ng-repeat="log in logentries track by $index">
+			<div class="col" ng-bind-html="log">
+			</div>
+		</div>
+	</ion-content>
+</ion-modal-view>

@@ -82,10 +82,10 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 			$scope.hasFetchedUser = true;
 			ApiEstiveAqui.fetchUserData().then(function(userData){
 				$scope.limit.max = userData.XL;
-				$scope.limit.total = EntryManager.getTodayLaunchesCount();
+				User.setLimit(userData.XL);
 				
 				ApiValidaHora.getSeeds(PassClockManager.get(), false).request().then(function(seeds){
-					var clocks;
+					var clocks = [];
 					PassClockManager.mergeWithSeeds(seeds.Tokens);
 					clocks = PassClockManager.get();
 					
@@ -101,6 +101,11 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				});
 				$scope.history = EntryManager.get();
 				$scope.runSync();
+			}, 
+			
+			function(){
+				$scope.limit = User.getLimit();
+				$scope.limit.total = EntryManager.getTodayLaunchesCount();
 			});
 		}
 	};
@@ -175,7 +180,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				$scope.registerData.token.code,
 				$scope.registerData.typedTime,
 				$scope.registerData.position
-			).disableAutoError().enableForever().request().then(function(calculated){
+			).disableAutoError().request().then(function(calculated){
 				$scope.registerData.launchTime = calculated.HoraLancada;
 				$scope.registerData.hashCode = calculated.HashCode;
 				$scope.displaySuccess();
@@ -216,7 +221,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 				$scope.registerData.hashCode,
 				$scope.registerData.position,
 				$scope.registerData.note
-			).disableConnectionCheck().disableAutoError().enableForever().request().then(
+			).disableConnectionCheck().disableAutoError().request().then(
 				function(launched){
 					//$scope.history.push(launched.Lancamento);
 					EntryManager.add(launched.Lancamento);
@@ -457,7 +462,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	$scope.otpcode = 'xxxxxx';
 	$scope.timer = 0;
 	$scope.fail = {button:null, title:null, message: null};
-	$scope.limit = {max: 0, total: 0};
+	$scope.limit = User.getLimit();
 	$scope.hasFetchedUser = false;
 	
 	resetRegister();

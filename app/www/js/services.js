@@ -25,7 +25,7 @@ angular.module('starter.services')
 			element.on('click', function() {
 				var url;
 				if($scope.isDroid)
-					url = 'market://details?id=br.com.dopaminamob.validahora';
+					url = 'market://details?id=com.estiveaqui.app';
 				else
 					url = 'itms-apps://itunes.apple.com/app/id1169693954';
 				

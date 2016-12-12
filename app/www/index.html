@@ -54,7 +54,9 @@
 		  		
 		  		if(params){
 		  			if(params.code){
-		  				window.location.href = '/#activation/'+params.code;
+		  				window.location.href = '#/activation/'+params.code;
+		  				console.log('#/activation/'+params.code);
+		  				
 		  			}else{
 		  				console.log('code not exists');
 		  			}
@@ -62,15 +64,15 @@
 		  			console.log('empty params');
 		  			console.log(params, url);
 		  		}
-			}, 0);
+			}, 1);
 		}
 		
 		function parseScheme(url){
 			if(!url)
 				url = '';
 			
-			var scheme = 'validahora://';
-			var paramsStr = url.replace(scheme).replace('?', '&');
+			var scheme = 'estiveaqui://';
+			var paramsStr = url.replace(scheme, '').replace('?', '&');
 			var paramsList = paramsStr.split('&');
 			var paramItem;
 			var params = {};

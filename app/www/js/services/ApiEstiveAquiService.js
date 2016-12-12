@@ -6,8 +6,16 @@ angular.module('starter.services')
 			//var id = response.IdentificadorAppUsuario;
 			var id = response.IdentificadorAppUsuario;
 			var nick = response.Apelido;
+			/*
+			RESPONSE
+			Apelido: "UsrNibles93",
+			ID: "Cadastra AppUsuario",
+			IdentificadorAppUsuario: "gEik3xwJb63Vrnfcj7t4xDsCowcwJIAoCebCxm2ZnR5tL4DvYI",
+			Mensagens: [],
+			ValidadoOk: true,
+			*/
 			if( id && nick ){
-				User.set(id, nick);
+				User.set(id, nick, code);
 				
 				return fetchUserData();
 			}else{
@@ -17,8 +25,19 @@ angular.module('starter.services')
 	};
 	
 	var fetchUserData = function(){
-		return call('LeAppUsuario', {IDAPP: User.getId()}).request().then(
+		return call('LeAppUsuario', {IDAPP: User.getId()}).enableForever().disableConnectionCheck().disableAutoError().request().then(
 			function(response){
+				/*
+				RESPONSE
+				Apelido: "Apple02",
+				ID: "Le Infos",
+				IdentificadorAppUsuario: "YkhDkhvl9lhOLTgt5WZTnaYcCTiD8i6uLKnbF4ghkGg8Ux0o0I",
+				Lancamentos: [],
+				Mensagens: [],
+				PassClocks: [{Status: "0", NumeroPassClock: "Apple-01", Apelido: "Escritorio"},…],
+				ValidadoOk: true,
+				XL: 200,
+				*/
 				PassClockManager.set(response.PassClocks);
 				EntryManager.set(response.Lancamentos.reverse());
 				

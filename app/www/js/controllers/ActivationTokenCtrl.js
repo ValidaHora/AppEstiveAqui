@@ -21,12 +21,16 @@ angular.module('starter.controllers')
 		);
 	}
 	
-	if($stateParams.code){
-		$scope.token.number = $stateParams.code;
-		$scope.lockCode = true;
-		$scope.activate();
-	}else{
-		$scope.lockCode = false;
-		//$scope.simpleAlert('Erro', 'Nenhum código de ativação informado');
-	}
+	$scope.$on('$ionicView.afterEnter', function(){
+		if($stateParams.code){
+			console.log('$stateParams');
+			console.log($stateParams);
+			$scope.token.number = $stateParams.code;
+			$scope.lockCode = true;
+			$scope.activate();
+		}else{
+			$scope.lockCode = false;
+			//$scope.simpleAlert('Erro', 'Nenhum código de ativação informado');
+		}
+	});
 })

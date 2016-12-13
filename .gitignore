@@ -1,0 +1,4 @@
+*.DS_Store
+*.sublime*
+app/resources/android
+app/resources/ios

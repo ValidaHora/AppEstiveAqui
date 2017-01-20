@@ -19,13 +19,13 @@ angular.module('starter.services')
 			LATITUDE: position.coords.latitude,
 			LONGITUDE: position.coords.longitude,
 		});
-	}
+	};
 	
 	var calcHourBatch = function(){
 		var batch = [];
 		var syncs = EntryManager.getSync();
 		var sync, item;
-		for(var i=0 in syncs){
+		for(var i in syncs){
 			sync = syncs[i];
 			
 			item = {
@@ -50,14 +50,14 @@ angular.module('starter.services')
 			LANCS: JSON.stringify(batch),
 		});
 		return api;
-	}
+	};
 	
 	var getSeeds = function(clocks, silent){
 		var seeds = [];
 		if( typeof silent=='undefined')
 			silent= true;
 		
-		for(var i=0 in clocks){
+		for(var i in clocks){
 			seeds.push(clocks[i].NumeroPassClock);
 		}
 		//seeds.push(clocks[96].NumeroPassClock);

@@ -4,7 +4,7 @@ angular.module('starter.services')
 	var register = function(code){
 		return call('CadastraAppUsuario', {CODATIVACAO: code}).request().then(function(response){
 			//var id = response.IdentificadorAppUsuario;
-			var id = response.IdentificadorAppUsuario;
+			var id = (response.Identificador) ? response.Identificador : response.IdentificadorAppUsuario;
 			var nick = response.Apelido;
 			/*
 			RESPONSE
@@ -79,7 +79,7 @@ angular.module('starter.services')
 		var sendTime = TimeHelper.calcDate();
 		var syncs = EntryManager.getSync();
 		var toCalc, item, sync;
-		for(var i=0 in launches){
+		for(var i in launches){
 			item = launches[i];
 			
 			if(item && (item.OK==true  || item.Erro.CE==102)){
@@ -91,13 +91,13 @@ angular.module('starter.services')
 						IL: sync._id,
 						PC: sync.token.clock,
 						CD: sync.token.code,
-						HL: sync.sendTime,
+						HL: sync.launchedTime,
 						NT: sync.note ? sync.note : "empty",
 						HC: sync.hashCode,
-						HD: sync.typedTime.substr(0, sync.typedTime.length-2),
+						HD: sync.typedTime,
 						LA: sync.position.coords.latitude,
 						LO: sync.position.coords.longitude,
-					}
+					};
 					
 					batch.push(toCalc);
 				}

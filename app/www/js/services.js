@@ -4,7 +4,10 @@ angular.module('starter.services')
 	return {
 		link: function($scope, element) {
 			element.on('click', function() {
-				$message = 'Baixe agora o estive aqui, o sistema de lançamento de horas prático, seguro, e na nuvem.\n\nhttp://www.validahora.com.br';
+				var $message = 'Conheça o sistema EstiveAqui de comprovação de presença em um determinado local.\n'+
+							'Auxilia o ponto dos empregados de pequenas empresas e domésticos, pode ser usado como um sistema de ronda de segurança.\n'+
+							'Acesse o site para maiores informações ou baixe o aplicativo de celular.\n\n'+
+							'www.EstiveAqui.com.br';
 				$cordovaSocialSharing.share($message/*, image, link*/).then(
 					function(result){
 						console.log(result);

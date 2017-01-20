@@ -32,11 +32,11 @@ angular.module('starter.services')
 		}
 		
 		return launches;
-	}
+	};
 	
 	var getTodayLaunchesCount = function(){
 		return getTodayLaunches().length;
-	}
+	};
 	
 	var setSelection = function(selection){
 		selected = selection;
@@ -171,11 +171,11 @@ angular.module('starter.services')
 	};
 	
 	var findById = function(id, returnIndex){
-		var clock = find(id, 'ID', returnIndex);
+		return find(id, 'ID', returnIndex);
 	};
 	
 	var findByClock = function(passClockId){
-		var clock = find(passClockId, 'PC ');
+		return find(passClockId, 'PC ');
 	};
 	
 	var findSyncById = function(id, returnIndex){
@@ -220,16 +220,16 @@ angular.module('starter.services')
 	var load = function(){
 		if(LocalStorage.has(KEY_ENTRIES)){
 			entries = LocalStorage.getObject(KEY_ENTRIES);
-		};
+		}
 		
 		if(LocalStorage.has(KEY_ENTRIES_SYNC)){
 			sync = LocalStorage.getObject(KEY_ENTRIES_SYNC);
-		};
+		}
 		
 		if(LocalStorage.has(KEY_ENTRIES_SELECTED)){
 			selected = LocalStorage.getObject(KEY_ENTRIES_SELECTED);
-		};
-	}
+		}
+	};
 	
 	load();
 	return {
@@ -250,5 +250,5 @@ angular.module('starter.services')
 		getSelection: getSelection,
 		load: load,
 		getTodayLaunchesCount: getTodayLaunchesCount,
-	}
+	};
 });

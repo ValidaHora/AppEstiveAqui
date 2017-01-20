@@ -5,7 +5,7 @@ module.exports = function(context) {
     var target = context.opts.projectRoot+'/www/js/app.js';
     var source;
     
-    if(context.opts.options.debug==true){
+    if(context.opts.options.debug && context.opts.options.debug==true){
     	source = context.opts.projectRoot+'/www/js/app.debug.js';
     }else{
     	source = context.opts.projectRoot+'/www/js/app.release.js';
@@ -31,4 +31,4 @@ module.exports = function(context) {
 			console.error(err);
 		}
 	});*/
-}
+};

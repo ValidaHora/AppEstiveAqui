@@ -238,7 +238,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 						button: null,
 						title: null,
 						message: null,
-					}
+					};
+					
 					var needSchedule = false;
 					
 					if(!$scope.hasNetwork){
@@ -268,6 +269,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 						EntryManager.schedule($scope.registerData);
 						$scope.history = EntryManager.get();
 						$scope.syncCount ++;
+						debugger;
 					}
 					
 					resetRegister();
@@ -285,34 +287,38 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	};
 	
 	$scope.runSync = function(){
-		if($scope.syncCount>0){
-			var syncErrors = [];
-			var decSyncBy = 0;
+		if( $scope.sync.length>0 ){
+			var syncErrorsLaunch = [];
+			var syncErrorsCalc = [];
 			
 			ApiValidaHora.calcHourBatch().setSilent(true).disableAutoError().request().then(function(responseHours){
 				var item, sync;
-				for(var i=0 in responseHours.Lancamentos){
+				debugger;
+				for(var i in responseHours.Lancamentos){
 					item = responseHours.Lancamentos[i];
 					sync = EntryManager.findSyncById(item.IL);
 					
-					if(item.OK==true){
-						if(sync){
+					if(sync){
+						if(item.OK==true){
 							sync.hashCode = item.HC;
 							sync.launchedTime = item.HL;
 							sync.sendTime = TimeHelper.calcDate(true);
 							EntryManager.updateSync(sync);
 						}else{
+							syncErrorsCalc.push('['+sync.token.code+'] '+item.Erro.ER);
 							$scope.removeFromSync(item.IL);
 						}
 					}else{
-						syncErrors.push('['+sync.token.code+'] '+item.Erro.ER);
 						$scope.removeFromSync(item.IL);
 					}
+				}
+				if(syncErrorsCalc.length>0){
+					$scope.simpleAlert('Erro', syncErrorsCalc.join('<br />'));
 				}
 				
 				ApiEstiveAqui.launchHourBatch(responseHours.Lancamentos).setSilent(true).request().then(function(responseLaunch){
 					var launched, sync;
-					for(var i=0 in responseLaunch.LNS){
+					for(var i in responseLaunch.LNS){
 						launched = responseLaunch.LNS[i];
 						sync = EntryManager.findSyncById(launched.IL);
 						if(launched && (launched.OK==true) ){
@@ -326,7 +332,8 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 								console.log('Sync ID['+launched.IL+'] not found in sync pool');
 							}
 						}else{
-							syncErrors.push('['+sync.token.code+'] '+launched.ER.ME);
+							syncErrorsLaunch.push('['+sync.token.code+'] '+launched.ER.ME);
+							console.log('[ERROR]sync: '+sync);
 							
 							//if(launched.ER.CE==102){
 								$scope.removeFromSync(launched.IL);
@@ -335,15 +342,15 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 					}
 					
 					$scope.limit.total = EntryManager.getTodayLaunchesCount();
-					if(syncErrors.length>0)
-						$scope.simpleAlert('Erro', syncErrors.join('<br />'));
+					if(syncErrorsLaunch.length>0)
+						$scope.simpleAlert('Erro', syncErrorsLaunch.join('<br />'));
 				});
-			})
+			});
 		}
 	};
 	
 	$scope.removeFromSync = function(id){
-		var removed = EntryManager.removeSync(id);
+		EntryManager.removeSync(id);
 		$scope.syncCount --;
 	};
 	
@@ -358,14 +365,16 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 			/*$scope.otpcode = 'xxxxxx';
 			$scope.timer = 0;*/
 		}
-	}
+	};
 	
-	$scope.checkLimit = function(){
-		console.log($scope.limit);
-		if( $scope.limit.total == $scope.limit.max ){
+	$scope.checkLimit = function(displayError){
+		var isFull = $scope.limit.total >= $scope.limit.max;
+		if( isFull && displayError===true ){
 			$scope.simpleAlert('Erro', 'Você atingiu seu limite de '+$scope.limit.max+' lançamentos diários');
 		}
-	}
+		
+		return isFull;
+	};
 	
 	var padToken = function(){
 		var tk = $scope.fakeToken.code;
@@ -408,7 +417,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		}
 		
 		return passes;
-	}
+	};
 	
 	var validateTest = function(token){
 		var date = new Date();
@@ -433,7 +442,7 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 		}
 		
 		return passes;
-	}
+	};
 	
 	var resetRegister = function(){
 		$scope.fakeToken.code = null;
@@ -453,7 +462,6 @@ angular.module('starter.controllers').controller('CheckInCtrl', function($rootSc
 	$scope.hasNetwork 	= false;
 	$scope.sync 		= EntryManager.getSync();
 	$scope.syncCount 	= $scope.sync.length;
-	$scope.sync.length;
 	$scope.syncDelay 	= 60000;
 	$scope.history 		= EntryManager.get();
 	$scope.isLoged 		= User.get().id!=undefined;

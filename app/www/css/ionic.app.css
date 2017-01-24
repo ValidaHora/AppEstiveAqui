@@ -9991,6 +9991,3 @@ table thead th {
 
 table tbody tr:nth-child(2n) td {
   background: #D6D6D6; }
-
-.not_launched {
-  font-weight: bold; }

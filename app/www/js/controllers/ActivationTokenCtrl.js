@@ -1,5 +1,5 @@
 angular.module('starter.controllers')
-.controller('ActivationTokenCtrl', function($scope, $state, $stateParams, $ionicHistory, ApiEstiveAqui){
+.controller('ActivationTokenCtrl', function($scope, $state, $stateParams, $ionicHistory, $cordovaInAppBrowser, ApiEstiveAqui){
 	$scope.token = {number:null};
 	$scope.lockCode = false;//true;
 	
@@ -19,7 +19,26 @@ angular.module('starter.controllers')
 				$scope.lockCode = false;
 			}
 		);
-	}
+	};
+	
+	$scope.downloadGestor = function(){
+		var url;
+		
+		if($scope.isDroid)
+			url = 'market://details?id=br.com.estiveaqui.app.gestor';
+		else
+			url = 'itms-apps://itunes.apple.com/app/id1180773138';
+		
+		$cordovaInAppBrowser.open(url, '_system').then(function(event) {
+		//$cordovaInAppBrowser.open('https://play.google.com/store/apps/details?id=com.dopaminamob.palavrasdosenhor').then(function(event) {
+	        //success
+	        console.log(event);
+		})
+		.catch(function(event) {
+			//error
+	        console.log(event);
+		});
+	};
 	
 	$scope.$on('$ionicView.afterEnter', function(){
 		if($stateParams.code){
@@ -33,4 +52,4 @@ angular.module('starter.controllers')
 			//$scope.simpleAlert('Erro', 'Nenhum código de ativação informado');
 		}
 	});
-})
+});

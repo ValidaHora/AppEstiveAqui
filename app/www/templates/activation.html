@@ -1,20 +1,32 @@
 <ion-view view-title="Ativação">
 	<ion-content class="content has-header">
 		<div id="checkin-wrapper">
-			<div class="row">
-				<div class="col col-80 col-offset-10 inserir-codigo">
-					<img src="img/relogio.png" />
-					<input type="text" name="token" placeholder="Código de Ativação" ng-model="token.number" ng-disabled="lockCode" />
-				</div>
-			</div>
+			<br /><br />
 			<div class="row">
 				<div class="col col-80 col-offset-10">
-					<button class="button button-block button-positive lancar-hora" ng-click="activate()">Ativar</button>
+					<p>Este app funciona em conjunto com o app <b>EstiveAqui Gestor!</b></p>
 				</div>
 			</div>
+			
 			<div class="row">
-				<div class="col text-center">
-					<p>Insira o código de ativação, caso não tenha um acesse <a onclick="window.open('http://www.estiveaqui.com.br', '_system', 'location=yes'); return false;">www.estiveaqui.com.br</a> e peça já o seu.</p>
+				<div class="col col-80 col-offset-10">
+					<p>Para usar o <b>EstiveAqui Gestor</b> você precisa ser convidado por um gestor.</p>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col col-80 col-offset-10">
+					<p>Peça ao seu gestor/empregador o envio do link de ativação deste app</p>
+				</div>
+			</div>
+			
+			<br />
+			<div class="row">
+				<div class="col col-80 col-offset-10 text-center" ng-click="downloadGestor()">
+					<p>O <b>EstiveAqui Gestor</b> pode ser baixado aqui</p>
+					<div>
+						<img src="img/icon-gestor.png" width="40%" class="icon-round" />
+					</div>
 				</div>
 			</div>
 		</div>
